@@ -1,16 +1,58 @@
-# task_management_app
+# [TASK MANAGEMENT APP]
 
-A new Flutter project.
+## 🚀 Deskripsi
 
-## Getting Started
+Aplikasi manajemen tugas (Task Management) yang modern dan responsif, dibangun menggunakan Flutter dan bahasa Dart. Aplikasi ini dirancang untuk membantu pengguna mengelola produktivitas harian dengan fitur pembuatan tugas, pelacakan progres, dan tampilan kalender.
 
-This project is a starting point for a Flutter application.
+Secara teknis, aplikasi ini mengimplementasikan GetX Ecosystem secara menyeluruh untuk:
 
-A few resources to get you started if this is your first Flutter project:
+▶️ State Management: Menggunakan reactive state (.obs) untuk sinkronisasi data real-time antar halaman (Home, Calendar, All Tasks).
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+▶️ Dependency Injection: Menggunakan Bindings untuk manajemen memori yang efisien.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+▶️ Route Management: Navigasi antar halaman tanpa context (Get.toNamed).
+
+▶️ Architecture: Struktur folder modular yang rapi (Model-View-Controller).
+
+Tech Stack:
+
+▶️ Flutter & Dart
+
+▶️ GetX (State Management)
+
+▶️ MVC Pattern
+
+## 📝 Fitur Utama
+
+Setelah instalasi selesai, Anda dapat menjalankan proyek dengan perintah berikut:
+
+1.  **✅ Dashboard Intuitif**
+    Ringkasan tugas hari ini dan yang akan datang dalam satu pandangan.
+
+2.  **✅ Kalender Interaktif**
+    Pilih tanggal untuk melihat jadwal spesifik Anda.
+
+3.  **✅ Manajemen Tugas Detail**
+    Tambahkan judul, sub-tugas (steps), dan tenggat waktu.
+
+4.  **✅ Pelacakan Progres**
+    Visualisasi progres tugas dengan progress bar yang dinamis.
+
+5.  **✅ Kategori Tugas**
+    Pisahkan tugas berdasarkan urgensinya.
+
+## 🔥 Kelas-NIM-Nama-Username github
+1. B - 202210370311112 - Muhammad Fauza Ramadhan (fauza2003)
+2. B - 202210370311150 - Muhammad Ali Fathir (userAlfa)
+3. D - 202210370311113 - Mohammad Eka Adhitya Indie Ramdhani (Jetz666)
+4. D - 202210370311140 - Zaidan Rizqullah (ZaidanRiz)
+
+## Link Figma : https://www.figma.com/design/A18XghnSdgislIBIbpziTs/Project-Rekayasa-Interaksi-New?node-id=123-10205&t=Ow4YAuzL0fiEt7v0-1
+
+## Worksheet :
+
+## Low Fidelity Prototype :
+
+## Tabel pembagian tugas (backlog) tiap anggota secara bergantian dengan level :
+
+Terima kasih telah mengunjungi repository ini!

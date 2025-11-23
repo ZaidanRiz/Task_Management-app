@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/app/modules/AllTask/views/all_task_view.dart';
 import 'package:task_management_app/app/modules/Settings/views/settings_view.dart';
+import 'app/modules/AllTask/views/AllTask_view.dart';
 import 'app/modules/login/views/login_view.dart';
 import 'app/modules/home/views/home_view.dart';
 import 'app/modules/signup/views/signup_view.dart';

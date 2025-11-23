@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/app/modules/calender/views/calender_view.dart';
+import 'package:task_management_app/app/modules/CreateTask/views/create_task_view.dart';
+// 1. Import halaman CreateTaskView
 
-// Asumsi: TaskCard sudah didefinisikan atau diimpor
-// Jika TaskCard Anda berada di ../widgets/task_card.dart, pastikan impornya benar.
+// Asumsi: Widget TaskCard ada di file terpisah. 
+// Jika belum, Anda bisa menyalin class TaskCard dari file sebelumnya ke bagian bawah file ini.
 // import '../widgets/task_card.dart'; 
 
 class AllTasksView extends StatelessWidget {
   const AllTasksView({super.key});
 
-  // --- Data Tugas (Sesuai Gambar) ---
+  // --- Data Tugas ---
   final List<Map<String, dynamic>> todayTasks = const [
     {
       'title': 'Design new ui presentation',
@@ -17,7 +18,7 @@ class AllTasksView extends StatelessWidget {
       'total': 10,
       'date': '7 Nov 2025',
       'dateColor': Colors.red,
-      'progressColor': Colors.green, // 10/10
+      'progressColor': Colors.green,
     },
     {
       'title': 'Add more ui/ux to mockups',
@@ -25,8 +26,8 @@ class AllTasksView extends StatelessWidget {
       'progress': 7,
       'total': 10,
       'date': '19 Nov 2025',
-      'dateColor': Color(0xFFF7941D), // Oranye
-      'progressColor': Colors.orange, // 7/10
+      'dateColor': Color(0xFFF7941D),
+      'progressColor': Colors.orange,
     },
   ];
 
@@ -37,21 +38,18 @@ class AllTasksView extends StatelessWidget {
       'progress': 3,
       'total': 10,
       'date': '1 Des 2025',
-      'dateColor': Color(0xFF6C63FF), // Ungu/Biru Muda
-      'progressColor': Colors.blue, // 3/10
+      'dateColor': Color(0xFF6C63FF),
+      'progressColor': Colors.blue,
     },
   ];
 
   @override
   Widget build(BuildContext context) {
-    // ----------------------------------------------------
-    // Menggunakan Scaffold dengan pengaturan Bottom Bar yang sama
-    // ----------------------------------------------------
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context), // Kembali ke halaman sebelumnya
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'All Tasks',
@@ -80,16 +78,14 @@ class AllTasksView extends StatelessWidget {
               _buildTaskHeader("Upcoming task"),
               ...upcomingTasks.map((task) => _buildTaskCard(task)).toList(),
               
-              const SizedBox(height: 100), // Ruang agar tidak tertutup Bottom Bar
+              const SizedBox(height: 100), 
             ],
           ),
         ),
       ),
 
-      // ----------------------------------------------------
-      // Bottom Bar (Diambil dari desain sebelumnya)
-      // ----------------------------------------------------
-      floatingActionButton: _buildFAB(),
+      // 2. Update pemanggilan _buildFAB dengan menyertakan context
+      floatingActionButton: _buildFAB(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: _buildBottomNavBar(context),
     );
@@ -97,7 +93,6 @@ class AllTasksView extends StatelessWidget {
 
   // --- WIDGET PEMBANTU ---
 
-  // Header Tugas
   Widget _buildTaskHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 10.0, bottom: 15.0),
@@ -108,8 +103,8 @@ class AllTasksView extends StatelessWidget {
     );
   }
 
-  // TaskCard Helper (Menggunakan widget TaskCard yang sudah ada)
   Widget _buildTaskCard(Map<String, dynamic> task) {
+    // Pastikan Widget TaskCard sudah tersedia (diimport atau didefinisikan di file ini)
     return TaskCard(
       title: task['title']!,
       project: task['project']!,
@@ -121,22 +116,26 @@ class AllTasksView extends StatelessWidget {
     );
   }
 
-  // Floating Action Button
-  Widget _buildFAB() {
+  // 3. Update Logic FAB: Menambahkan parameter context dan Navigator.push
+  Widget _buildFAB(BuildContext context) {
     return FloatingActionButton(
-      onPressed: () {},
-      child: const Icon(Icons.add, size: 30, color: Colors.white),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CreateTaskView()),
+        );
+      },
       backgroundColor: Colors.blue,
       elevation: 4.0,
       shape: const CircleBorder(),
+      child: const Icon(Icons.add, size: 30, color: Colors.white),
     );
   }
 
-  // Bottom Navigation Bar
   Widget _buildBottomNavBar(BuildContext context) {
     const String homeRoute = '/home';
     const String calendarRoute = '/calendar';
-    const String descriptionRoute = '/description'; // Rute untuk halaman ini
+    const String descriptionRoute = '/description'; 
     const String settingsRoute = '/settings';
     
     return BottomAppBar(
@@ -148,14 +147,10 @@ class AllTasksView extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            // Home
             _buildNavItem(context, Icons.home, isSelected: false, routeName: homeRoute),
-            // Kalender
             _buildNavItem(context, Icons.calendar_today, isSelected: false, routeName: calendarRoute), 
             const SizedBox(width: 40), 
-            // Deskripsi (All Tasks) - Terpilih di halaman ini
             _buildNavItem(context, Icons.description, isSelected: true, routeName: descriptionRoute),
-            // Pengaturan
             _buildNavItem(context, Icons.settings, isSelected: false, routeName: settingsRoute),
           ],
         ),
@@ -163,7 +158,6 @@ class AllTasksView extends StatelessWidget {
     );
   }
 
-  // Fungsi Helper untuk Item Navigasi (Harus di luar kelas Stateless/Stateful)
   Widget _buildNavItem(BuildContext context, IconData icon, {bool isSelected = false, String? routeName}) {
     return IconButton(
       icon: Icon(
@@ -173,10 +167,85 @@ class AllTasksView extends StatelessWidget {
       ),
       onPressed: () {
         if (routeName != null && !isSelected) {
-          // Navigasi menggantikan halaman saat ini
           Navigator.pushReplacementNamed(context, routeName);
         }
       },
+    );
+  }
+}
+
+// --- DUMMY TASK CARD (Hapus jika sudah import dari file lain) ---
+class TaskCard extends StatelessWidget {
+  final String title;
+  final String project;
+  final int progress;
+  final int total;
+  final String date;
+  final Color dateColor;
+  final Color progressColor;
+
+  const TaskCard({
+    super.key,
+    required this.title,
+    required this.project,
+    required this.progress,
+    required this.total,
+    required this.date,
+    required this.dateColor,
+    required this.progressColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double progressPercentage = progress / total;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: dateColor.withOpacity(0.4), width: 1),
+        boxShadow: [
+          BoxShadow(color: Colors.grey.withOpacity(0.15), spreadRadius: 2, blurRadius: 10, offset: const Offset(0, 5)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Icon(Icons.more_horiz, color: Colors.grey),
+          ]),
+          const SizedBox(height: 5),
+          Text(project, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+          const SizedBox(height: 15),
+          Row(children: [
+            const Icon(Icons.list_alt, size: 14, color: Colors.grey),
+            const SizedBox(width: 5),
+            const Text('Progress', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: LinearProgressIndicator(
+                  value: progressPercentage,
+                  minHeight: 8,
+                  backgroundColor: Colors.grey.shade200,
+                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text('$progress/$total', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+          ]),
+          const SizedBox(height: 15),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(color: dateColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            child: Text(date, style: TextStyle(color: dateColor, fontWeight: FontWeight.bold, fontSize: 12)),
+          ),
+        ],
+      ),
     );
   }
 }

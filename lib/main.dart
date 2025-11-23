@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_management_app/app/modules/CreateTask/views/create_task_view.dart';
 import 'package:task_management_app/app/modules/Settings/views/settings_view.dart';
 import 'app/modules/AllTask/views/AllTask_view.dart';
 import 'app/modules/login/views/login_view.dart';
@@ -33,7 +34,8 @@ class MyApp extends StatelessWidget {
         '/forgot-password': (context) => const ForgotPasswordView(), //--- Route ke  Halaman Lupa Password
         '/calendar': (context) => const CalendarTasksScreen(), //--- Route ke Halaman Kalender
         '/description': (context) => const AllTasksView(), //--- Route ke Halaman All Tasks
-        '/settings': (context) => const SettingsView()
+        '/settings': (context) => const SettingsView(),
+        '/create-task': (context) => const CreateTaskView(),
       },
     );
   }

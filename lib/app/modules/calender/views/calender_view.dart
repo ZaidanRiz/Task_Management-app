@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:task_management_app/app/modules/CreateTask/views/create_task_view.dart';
+// Pastikan Anda mengimpor file CreateTaskView di sini
+// Jika TaskCard sudah dipisah, uncomment baris di bawah dan hapus class TaskCard di file ini
+// import '../widgets/task_card.dart';
 
-// --- TASK CARD (Wajib Didefinisikan/Diimpor di sini) ---
-// Jika TaskCard Anda berada di '../widgets/task_card.dart', Anda bisa menghapus kode TaskCard di bawah
-// dan menggantinya dengan: import '../widgets/task_card.dart';
-
+// --- TASK CARD (Biarkan di sini jika belum dipisah ke file widgets) ---
 class TaskCard extends StatelessWidget {
   final String title;
   final String project;
@@ -88,10 +89,9 @@ class TaskCard extends StatelessWidget {
   }
 }
 
-// --- WIDGET HALAMAN KALENDER & TUGAS UTAMA (CalendarTasksScreen) ---
+// --- WIDGET HALAMAN KALENDER & TUGAS UTAMA ---
 
 class CalendarTasksScreen extends StatefulWidget {
-  // Pastikan rute '/calendar' di main.dart menunjuk ke kelas ini.
   const CalendarTasksScreen({super.key});
 
   @override
@@ -99,10 +99,8 @@ class CalendarTasksScreen extends StatefulWidget {
 }
 
 class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
-  // State untuk melacak tanggal yang dipilih di kalender
   int selectedDay = 16; 
 
-  // Data tugas yang Tampil di Halaman Kalender
   final List<Map<String, dynamic>> displayedTasks = const [
     {
       'title': 'Design new ui presentation',
@@ -130,7 +128,6 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          // Kembali ke halaman sebelumnya (HomeView)
           onPressed: () => Navigator.pop(context), 
         ),
         title: const Text(
@@ -159,7 +156,7 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
             ),
           ),
 
-          // 3. Daftar Tugas (Menggunakan data displayedTasks)
+          // 3. Daftar Tugas
           Expanded(
             child: _buildTaskList(),
           ),
@@ -229,7 +226,6 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
                       setState(() {
                         selectedDay = day;
                       });
-                      // Di sini Anda bisa menambahkan logika untuk memuat tugas berdasarkan 'day'
                     },
                     child: Container(
                       height: 30,
@@ -278,9 +274,17 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
   }
 
   // --- WIDGET NAVIGASI BAWAH ---
+  
+  // [UPDATE] Ini adalah fungsi yang dimodifikasi untuk navigasi ke CreateTaskView
   Widget _buildFAB() {
     return FloatingActionButton(
-      onPressed: () {},
+      onPressed: () {
+        // Navigasi ke CreateTaskView saat tombol ditekan
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const CreateTaskView()),
+        );
+      },
       child: const Icon(Icons.add, size: 30, color: Colors.white),
       backgroundColor: Colors.blue,
       elevation: 4.0,
@@ -289,55 +293,43 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
   }
 
   Widget _buildBottomNavBar() {
-  // Asumsikan rute yang telah didefinisikan di main.dart
-  const String homeRoute = '/home';
-  const String calendarRoute = '/calendar';
-  const String descriptionRoute = '/description'; // Rute AllTasksView
-  const String settingsRoute = '/settings';      // Rute SettingsView
-  
-  return BottomAppBar(
-    shape: const CircularNotchedRectangle(),
-    notchMargin: 8.0,
-    color: Colors.white,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          // 1. Home: Navigasi ke '/'
-          _buildNavItem(context, Icons.home, isSelected: false, routeName: homeRoute),
-          
-          // 2. Kalender: Terpilih (isSelected: true)
-          // Tidak perlu rute karena sudah di sini, tapi disertakan untuk konsistensi
-          _buildNavItem(context, Icons.calendar_today, isSelected: true, routeName: calendarRoute), 
-          
-          const SizedBox(width: 40), 
-          
-          // 3. Deskripsi (All Tasks): Navigasi ke '/description'
-          _buildNavItem(context, Icons.description, isSelected: false, routeName: descriptionRoute),
-          
-          // 4. Pengaturan (Settings): Navigasi ke '/settings'
-          _buildNavItem(context, Icons.settings, isSelected: false, routeName: settingsRoute),
-        ],
+    const String homeRoute = '/home';
+    const String calendarRoute = '/calendar';
+    const String descriptionRoute = '/description';
+    const String settingsRoute = '/settings';
+    
+    return BottomAppBar(
+      shape: const CircularNotchedRectangle(),
+      notchMargin: 8.0,
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            _buildNavItem(context, Icons.home, isSelected: false, routeName: homeRoute),
+            _buildNavItem(context, Icons.calendar_today, isSelected: true, routeName: calendarRoute), 
+            const SizedBox(width: 40), 
+            _buildNavItem(context, Icons.description, isSelected: false, routeName: descriptionRoute),
+            _buildNavItem(context, Icons.settings, isSelected: false, routeName: settingsRoute),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-// FUNGSI HELPER UNTUK ITEM NAVIGASI DENGAN LOGIKA ROUTING
-Widget _buildNavItem(BuildContext context, IconData icon, {bool isSelected = false, String? routeName}) {
-  return IconButton(
-    icon: Icon(
-      icon,
-      color: isSelected ? Colors.blue : Colors.black54,
-      size: 24,
-    ),
-    onPressed: () {
-      if (routeName != null && !isSelected) {
-        // Navigasi menggantikan halaman saat ini (pushReplacementNamed)
-        Navigator.pushReplacementNamed(context, routeName);
-      }
-    },
-  );
-}
+  Widget _buildNavItem(BuildContext context, IconData icon, {bool isSelected = false, String? routeName}) {
+    return IconButton(
+      icon: Icon(
+        icon,
+        color: isSelected ? Colors.blue : Colors.black54,
+        size: 24,
+      ),
+      onPressed: () {
+        if (routeName != null && !isSelected) {
+          Navigator.pushReplacementNamed(context, routeName);
+        }
+      },
+    );
+  }
 }

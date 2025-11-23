@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-// Import widget pecahan dari folder sebelah
-import '../widgets/task_card.dart'; 
+import 'package:task_management_app/app/modules/CreateTask/views/create_task_view.dart';
+import '../widgets/task_card.dart'; // Pastikan path import sesuai
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -21,9 +21,7 @@ class HomeView extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))],
                 ),
                 child: const TextField(
                   decoration: InputDecoration(
@@ -33,7 +31,6 @@ class HomeView extends StatelessWidget {
                   ),
                 ),
               ),
-              
               const SizedBox(height: 30),
 
               // Categories
@@ -42,15 +39,24 @@ class HomeView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildCategoryCard(Icons.checklist, "To Do List", Colors.blue),
+                  // 1. MODIFIKASI DI SINI: Menambahkan onTap untuk navigasi ke AllTasksView
+                  _buildCategoryCard(
+                    Icons.checklist, 
+                    "To Do List", 
+                    Colors.blue,
+                    onTap: () {
+                      // Navigasi ke AllTasksView (Route: /description)
+                      Navigator.pushNamed(context, '/description');
+                    },
+                  ),
+                  
                   _buildCategoryCard(Icons.games, "Task For Kids", Colors.orange),
                   _buildCategoryCard(Icons.lightbulb, "AI Assistant", Colors.yellow),
                 ],
               ),
-
               const SizedBox(height: 30),
 
-              // Today's Task (Menggunakan Widget TaskCard yang dipisah)
+              // Today's Task
               const Text("Today's task", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 15),
               const TaskCard(
@@ -60,7 +66,6 @@ class HomeView extends StatelessWidget {
                 progress: 0.7,
                 progressText: "7/10",
               ),
-
               const SizedBox(height: 20),
 
               // Upcoming Task
@@ -78,13 +83,22 @@ class HomeView extends StatelessWidget {
           ),
         ),
       ),
+      
+      // TOMBOL TAMBAH DENGAN NAVIGASI
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          // Navigasi ke CreateTaskView
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CreateTaskView()),
+          );
+        },
         backgroundColor: Colors.blue,
         shape: const CircleBorder(),
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
@@ -96,44 +110,53 @@ class HomeView extends StatelessWidget {
             children: [
               IconButton(onPressed: () {}, icon: const Icon(Icons.home, color: Colors.blue)),
               IconButton(
-    onPressed: () {
-      // Navigasi ke rute yang didefinisikan di main.dart
-      Navigator.pushNamed(context, '/calendar'); 
-    },
-    // Icon dipindahkan ke sini
-    icon: const Icon(Icons.calendar_month, color: Colors.grey)
-  ),
+                onPressed: () {
+                    Navigator.pushNamed(context, '/calendar'); 
+                }, 
+                icon: const Icon(Icons.calendar_month, color: Colors.grey)
+              ),
               const SizedBox(width: 40),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.description, color: Colors.grey)),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.settings, color: Colors.grey)),
-            ],
+              IconButton(
+                onPressed: () {
+                  // Navigasi ke rute yang didefinisikan di main.dart
+                  Navigator.pushNamed(context, '/description'); 
+                },
+                icon: const Icon(Icons.description, color: Colors.grey)
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/settings'); 
+                },
+                icon: const Icon(Icons.settings, color: Colors.grey)
+              ),
+            ]
           ),
         ),
       ),
     );
   }
 
-  // Helper widget untuk Kategori (masih cukup kecil untuk ditaruh di sini)
-  Widget _buildCategoryCard(IconData icon, String title, Color color) {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, spreadRadius: 1),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 32),
-          const SizedBox(height: 8),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-        ],
+  // 2. UPDATE HELPER WIDGET: Menambahkan parameter onTap
+  Widget _buildCategoryCard(IconData icon, String title, Color color, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap, // Menghubungkan fungsi tap
+      child: Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, spreadRadius: 1)],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 32),
+            const SizedBox(height: 8),
+            Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+          ],
+        ),
       ),
     );
   }
 }
-

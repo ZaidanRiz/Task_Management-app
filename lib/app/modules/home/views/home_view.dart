@@ -95,7 +95,14 @@ class HomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(onPressed: () {}, icon: const Icon(Icons.home, color: Colors.blue)),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.calendar_month, color: Colors.grey)),
+              IconButton(
+    onPressed: () {
+      // Navigasi ke rute yang didefinisikan di main.dart
+      Navigator.pushNamed(context, '/calendar'); 
+    },
+    // Icon dipindahkan ke sini
+    icon: const Icon(Icons.calendar_month, color: Colors.grey)
+  ),
               const SizedBox(width: 40),
               IconButton(onPressed: () {}, icon: const Icon(Icons.description, color: Colors.grey)),
               IconButton(onPressed: () {}, icon: const Icon(Icons.settings, color: Colors.grey)),

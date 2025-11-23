@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -14,14 +15,49 @@ class _LoginViewState extends State<LoginView> {
   // Variable untuk mengatur status sembunyi/lihat password
   bool _isObscure = true;
 
-  void _handleLogin() {
+  // LOGIKA LOGIN DENGAN GETX & DELAY
+  void _handleLogin() async {
     if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
-      Navigator.pushReplacementNamed(context, '/home');
+      
+      // 1. Tampilkan Notifikasi SUKSES
+      Get.snackbar(
+        "Login Berhasil",
+        "Selamat datang kembali!",
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
+        duration: const Duration(seconds: 2),
+      );
+
+      // 2. Beri jeda waktu agar notif terbaca dulu
+      await Future.delayed(const Duration(milliseconds: 1500));
+
+      // 3. Pindah ke Home & Hapus History (agar user tidak bisa back ke login)
+      Get.offNamed('/home'); 
+
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Email dan Password tidak boleh kosong")),
+      // Notifikasi ERROR
+      Get.snackbar(
+        "Gagal Masuk",
+        "Email dan Password tidak boleh kosong",
+        icon: const Icon(Icons.error, color: Colors.white),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -29,11 +65,11 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center( // Center agar konten berada di tengah secara vertikal jika layar tinggi
-          child: SingleChildScrollView( // Agar tidak error jika keyboard muncul
+        child: Center(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // Default rata kiri untuk elemen anak
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 1. HEADER CENTERED
                 const Center(
@@ -62,7 +98,6 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 25),
 
                 // 3. EMAIL SECTION
-                // Label di atas TextField
                 Row(
                   children: const [
                     Icon(Icons.email_outlined, size: 18, color: Colors.black54),
@@ -75,15 +110,14 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const SizedBox(height: 10),
                 
-                // Input Field Email
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    hintText: "Enter your email", // Placeholder di dalam
+                    hintText: "Enter your email",
                     hintStyle: TextStyle(color: Colors.grey.shade400),
                     contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20), // Lebih bulat
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -99,7 +133,6 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(height: 20),
 
                 // 4. PASSWORD SECTION
-                // Label di atas TextField
                 Row(
                   children: const [
                     Icon(Icons.lock_outline, size: 18, color: Colors.black54),
@@ -112,16 +145,15 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const SizedBox(height: 10),
 
-                // Input Field Password
                 TextField(
                   controller: _passwordController,
-                  obscureText: _isObscure, // Menggunakan variable state
+                  obscureText: _isObscure,
                   decoration: InputDecoration(
                     hintText: "Enter your password",
                     hintStyle: TextStyle(color: Colors.grey.shade400),
                     contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20), // Lebih bulat
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -131,7 +163,6 @@ class _LoginViewState extends State<LoginView> {
                       borderRadius: BorderRadius.circular(20),
                       borderSide: const BorderSide(color: Colors.blue),
                     ),
-                    // Tombol Mata (Hide/Show)
                     suffixIcon: IconButton(
                       icon: Icon(
                         _isObscure ? Icons.visibility_off : Icons.visibility,
@@ -139,7 +170,7 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       onPressed: () {
                         setState(() {
-                          _isObscure = !_isObscure; // Membalikkan nilai true/false
+                          _isObscure = !_isObscure;
                         });
                       },
                     ),
@@ -151,7 +182,8 @@ class _LoginViewState extends State<LoginView> {
                 Center(
                   child: TextButton(
                     onPressed: () {
-                    Navigator.pushNamed(context, '/forgot-password');
+                      // Menggunakan GetX Navigation
+                      Get.toNamed('/forgot-password');
                     },
                     child: const Text(
                       "Forgot Password?",
@@ -165,14 +197,14 @@ class _LoginViewState extends State<LoginView> {
                 // 5. BUTTON LOGIN
                 SizedBox(
                   width: double.infinity,
-                  height: 55, // Sedikit lebih tinggi biar gagah
+                  height: 55,
                   child: ElevatedButton(
-                    onPressed: _handleLogin,
+                    onPressed: _handleLogin, // Memanggil fungsi async di atas
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
-                      elevation: 0, // Flat design
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30), // Sangat bulat (Pill shape)
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: const Text(
@@ -192,11 +224,12 @@ class _LoginViewState extends State<LoginView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have a account? "),
+                    const Text("Don't have an account? "),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/signup');
-          },
+                        // Menggunakan GetX Navigation
+                        Get.toNamed('/signup');
+                      },
                       child: const Text(
                         "Sign up",
                         style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),

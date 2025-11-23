@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-
-// 1. IMPORT HALAMAN YANG DIBUTUHKAN
-// Sesuaikan path ini dengan struktur folder project Anda
-import '../../CreateTask/views/create_task_view.dart'; 
-import '../../login/views/login_view.dart'; 
+import 'package:get/get.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
-  // Konstanta Rute untuk Bottom Navigation Bar
+  // Konstanta Rute (Tetap disimpan untuk referensi, tapi dipanggil pakai String di GetX)
   static const String homeRoute = '/home';
   static const String calendarRoute = '/calendar';
   static const String descriptionRoute = '/description';
@@ -20,7 +16,8 @@ class SettingsView extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          // GetX: Kembali ke halaman sebelumnya
+          onPressed: () => Get.back(),
         ),
         title: const Text(
           'Settings',
@@ -54,32 +51,36 @@ class SettingsView extends StatelessWidget {
                 icon: Icons.notifications,
                 title: 'Notifications',
                 onTap: () {
-                  // Tambahkan logika notifikasi di sini jika ada
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Notification settings clicked")),
+                  // GetX Snackbar
+                  Get.snackbar(
+                    "Notifications", 
+                    "Notification settings clicked",
+                    snackPosition: SnackPosition.TOP,
+                    backgroundColor: Colors.blue.withOpacity(0.1),
+                    duration: const Duration(seconds: 1),
                   );
                 },
               ),
               
               const SizedBox(height: 15),
 
-              // Opsi Logout (DENGAN LOGIKA LOGOUT)
+              // Opsi Logout
               _buildOptionTile(
                 icon: Icons.logout,
                 title: 'Logout',
                 onTap: () {
-                  _handleLogout(context);
+                  _handleLogout();
                 },
               ),
               
-              const SizedBox(height: 100), // Spasi bawah agar tidak tertutup FAB/BottomBar
+              const SizedBox(height: 100), 
             ],
           ),
         ),
       ),
 
       // --- 3. FLOATING ACTION BUTTON (+) ---
-      floatingActionButton: _buildFAB(context),
+      floatingActionButton: _buildFAB(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       
       // --- 4. BOTTOM NAVIGATION BAR ---
@@ -88,39 +89,28 @@ class SettingsView extends StatelessWidget {
   }
 
   // ==========================================
-  //           FUNGSI LOGIKA & WIDGET
+  //            FUNGSI LOGIKA & WIDGET
   // ==========================================
 
-  // Logika Logout
-  void _handleLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Logout"),
-          content: const Text("Are you sure you want to logout?"),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          actions: [
-            TextButton(
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text("Logout", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-              onPressed: () {
-                Navigator.of(context).pop(); // Tutup Dialog
-                
-                // NAVIGASI KE LOGIN DAN HAPUS HISTORY
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginView()), 
-                  (Route<dynamic> route) => false, // false = hapus semua rute sebelumnya
-                );
-              },
-            ),
-          ],
-        );
+  // Logika Logout dengan GetX Dialog
+  void _handleLogout() {
+    Get.defaultDialog(
+      title: "Logout",
+      titleStyle: const TextStyle(fontWeight: FontWeight.bold),
+      middleText: "Are you sure you want to logout?",
+      textCancel: "Cancel",
+      textConfirm: "Logout",
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.red,
+      cancelTextColor: Colors.black,
+      radius: 15,
+      onConfirm: () {
+        // Hapus semua rute dan kembali ke login
+        Get.offAllNamed('/login'); 
       },
+      onCancel: () {
+        // GetX otomatis menutup dialog, tidak perlu code tambahan
+      }
     );
   }
 
@@ -135,19 +125,19 @@ class SettingsView extends StatelessWidget {
           BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
         ],
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.person_pin, size: 40, color: Colors.black87),
-          SizedBox(width: 15),
+          const Icon(Icons.person_pin, size: 40, color: Colors.black87),
+          const SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: const [
               Text(
-                'Name', // Bisa diganti variabel nama user
+                'Zaidan Rizqullah', // Nama Dummy
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Text(
-                '6, October 2023', // Bisa diganti tanggal hari ini
+                '24, November 2025', 
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
@@ -157,7 +147,7 @@ class SettingsView extends StatelessWidget {
     );
   }
 
-  // Widget Item Opsi (Notification / Logout)
+  // Widget Item Opsi
   Widget _buildOptionTile({
     required IconData icon,
     required String title,
@@ -192,14 +182,11 @@ class SettingsView extends StatelessWidget {
   }
 
   // Widget Tombol Tambah (+)
-  Widget _buildFAB(BuildContext context) {
+  Widget _buildFAB() {
     return FloatingActionButton(
       onPressed: () {
-        // Navigasi ke CreateTaskView
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CreateTaskView()),
-        );
+        // GetX Navigasi ke CreateTask
+        Get.toNamed('/create-task');
       },
       backgroundColor: Colors.blue,
       elevation: 4.0,
@@ -219,11 +206,11 @@ class SettingsView extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            _buildNavItem(context, Icons.home, isSelected: false, routeName: homeRoute),
-            _buildNavItem(context, Icons.calendar_today, isSelected: false, routeName: calendarRoute),
+            _buildNavItem(Icons.home, isSelected: false, routeName: homeRoute),
+            _buildNavItem(Icons.calendar_today, isSelected: false, routeName: calendarRoute),
             const SizedBox(width: 40), // Spasi untuk FAB
-            _buildNavItem(context, Icons.description, isSelected: false, routeName: descriptionRoute),
-            _buildNavItem(context, Icons.settings, isSelected: true, routeName: settingsRoute), // Aktif
+            _buildNavItem(Icons.description, isSelected: false, routeName: descriptionRoute),
+            _buildNavItem(Icons.settings, isSelected: true, routeName: settingsRoute), // Aktif
           ],
         ),
       ),
@@ -231,7 +218,7 @@ class SettingsView extends StatelessWidget {
   }
   
   // Widget Item Navigasi Bottom Bar
-  Widget _buildNavItem(BuildContext context, IconData icon, {bool isSelected = false, String? routeName}) {
+  Widget _buildNavItem(IconData icon, {bool isSelected = false, String? routeName}) {
     return IconButton(
       icon: Icon(
         icon,
@@ -240,8 +227,8 @@ class SettingsView extends StatelessWidget {
       ),
       onPressed: () {
         if (routeName != null && !isSelected) {
-          // Pindah halaman menggunakan Named Route
-          Navigator.pushReplacementNamed(context, routeName);
+          // GetX: Pindah halaman tanpa animasi numpuk (OffNamed)
+          Get.offNamed(routeName);
         }
       },
     );

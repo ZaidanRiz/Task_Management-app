@@ -1,23 +1,14 @@
 import 'package:get/get.dart';
+import 'package:task_management_app/app/controllers/task_controller.dart';
+import 'package:task_management_app/app/data/models/task_model.dart';
 
 class HomeController extends GetxController {
-  //TODO: Implement HomeController
+  // 1. Ambil Controller Global
+  final TaskController taskController = Get.find<TaskController>();
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
-  }
+  // 2. Getter untuk Today Tasks (Otomatis update karena Rx)
+  List<TaskModel> get todayTasks => taskController.todayTasks;
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
+  // 3. Getter untuk Upcoming Tasks
+  List<TaskModel> get upcomingTasks => taskController.upcomingTasks;
 }

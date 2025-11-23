@@ -1,126 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/app/modules/CreateTask/views/create_task_view.dart';
-// Pastikan Anda mengimpor file CreateTaskView di sini
-// Jika TaskCard sudah dipisah, uncomment baris di bawah dan hapus class TaskCard di file ini
-// import '../widgets/task_card.dart';
+import 'package:get/get.dart';
+import '../controllers/calendar_controller.dart';
 
-// --- TASK CARD (Biarkan di sini jika belum dipisah ke file widgets) ---
-class TaskCard extends StatelessWidget {
-  final String title;
-  final String project;
-  final int progress;
-  final int total;
-  final String date;
-  final Color dateColor;
-  final Color progressColor;
-
-  const TaskCard({
-    required this.title,
-    required this.project,
-    required this.progress,
-    required this.total,
-    required this.date,
-    required this.dateColor,
-    required this.progressColor,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    double progressPercentage = progress / total;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: dateColor.withOpacity(0.4), width: 1), 
-        boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.15), spreadRadius: 2, blurRadius: 10, offset: const Offset(0, 5)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const Icon(Icons.more_horiz, color: Colors.grey),
-            ],
-          ),
-          const SizedBox(height: 5),
-          Text(project, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
-          const SizedBox(height: 15),
-          Row(
-            children: <Widget>[
-              const Icon(Icons.list_alt, size: 14, color: Colors.grey),
-              const SizedBox(width: 5),
-              const Text('Progress', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: progressPercentage,
-                    minHeight: 8,
-                    backgroundColor: Colors.grey.shade200,
-                    valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text('$progress/$total', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          const SizedBox(height: 15),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: dateColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(date, style: TextStyle(color: dateColor, fontWeight: FontWeight.bold, fontSize: 12)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// --- WIDGET HALAMAN KALENDER & TUGAS UTAMA ---
-
-class CalendarTasksScreen extends StatefulWidget {
-  const CalendarTasksScreen({super.key});
-
-  @override
-  State<CalendarTasksScreen> createState() => _CalendarTasksScreenState();
-}
-
-class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
-  int selectedDay = 16; 
-
-  final List<Map<String, dynamic>> displayedTasks = const [
-    {
-      'title': 'Design new ui presentation',
-      'project': 'RI Task',
-      'progress': 10,
-      'total': 10,
-      'date': '7 Nov 2025',
-      'dateColor': Colors.red,
-      'progressColor': Colors.green,
-    },
-    {
-      'title': 'Add more ui/ux to mockups',
-      'project': 'PKPL Task',
-      'progress': 7,
-      'total': 10,
-      'date': '19 Nov 2025',
-      'dateColor': Color(0xFFF7941D),
-      'progressColor': Colors.orange,
-    },
-  ];
+class CalendarView extends GetView<CalendarController> {
+  const CalendarView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +11,7 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context), 
+          onPressed: () => Get.back(),
         ),
         title: const Text(
           'Calendar',
@@ -141,13 +24,13 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // 1. Bagian Kalender Interaktif
+          // 1. Kalender Interaktif
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-            child: _buildCalendarView(),
+            child: _buildCalendarWidget(),
           ),
 
-          // 2. Judul 'Today's task'
+          // 2. Judul
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
             child: Text(
@@ -156,22 +39,39 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
             ),
           ),
 
-          // 3. Daftar Tugas
+          // 3. Daftar Tugas (Reaktif dengan Obx)
           Expanded(
-            child: _buildTaskList(),
+            child: Obx(() => ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: controller.displayedTasks.length,
+              itemBuilder: (context, index) {
+                final task = controller.displayedTasks[index];
+                
+                return TaskCard( 
+                  title: task.title,           // Akses Property Model
+                  project: task.project,
+                  progress: task.progress,
+                  total: task.total,
+                  date: task.date,
+                  dateColor: task.dateColor,
+                  progressColor: task.progressColor,
+                  onTap: () => Get.toNamed('/detail-task'),
+                );
+              },
+            )),
           ),
         ],
       ),
       
-      // Bottom Bar 
       floatingActionButton: _buildFAB(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
-  // --- WIDGET KALENDER INTERAKTIF ---
-  Widget _buildCalendarView() {
+  // --- WIDGET HELPER ---
+
+  Widget _buildCalendarWidget() {
     final List<String> daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     final List<int> daysOfMonth = [0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 0, 0, 0, 0]; 
 
@@ -208,7 +108,8 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
               ),
             ],
           ),
-          Table(
+          
+          Obx(() => Table(
             border: TableBorder.all(color: Colors.transparent),
             children: List.generate((daysOfMonth.length / 7).ceil(), (row) {
               return TableRow(
@@ -219,17 +120,17 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
                   }
                   
                   final day = daysOfMonth[index];
-                  bool isSelected = day == selectedDay;
+                  bool isSelected = day == controller.selectedDay.value;
                   
                   return GestureDetector( 
-                    onTap: () {
-                      setState(() {
-                        selectedDay = day;
-                      });
-                    },
+                    onTap: () => controller.changeDate(day),
                     child: Container(
                       height: 30,
                       alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected ? Colors.blue : Colors.transparent,
+                      ),
                       child: Text(
                         day.toString(),
                         style: TextStyle(
@@ -238,66 +139,28 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isSelected ? Colors.blue : Colors.transparent,
-                      ),
                     ),
                   );
                 }),
               );
             }),
-          ),
+          )),
         ],
       ),
     );
   }
 
-  // --- WIDGET DAFTAR TUGAS ---
-  Widget _buildTaskList() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: displayedTasks.length,
-      itemBuilder: (context, index) {
-        final task = displayedTasks[index];
-        return TaskCard( 
-          title: task['title']!,
-          project: task['project']!,
-          progress: task['progress']!,
-          total: task['total']!,
-          date: task['date']!,
-          dateColor: task['dateColor']!,
-          progressColor: task['progressColor']!,
-        );
-      },
-    );
-  }
-
-  // --- WIDGET NAVIGASI BAWAH ---
-  
-  // [UPDATE] Ini adalah fungsi yang dimodifikasi untuk navigasi ke CreateTaskView
   Widget _buildFAB() {
     return FloatingActionButton(
-      onPressed: () {
-        // Navigasi ke CreateTaskView saat tombol ditekan
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CreateTaskView()),
-        );
-      },
-      child: const Icon(Icons.add, size: 30, color: Colors.white),
+      onPressed: () => Get.toNamed('/create-task'),
       backgroundColor: Colors.blue,
       elevation: 4.0,
       shape: const CircleBorder(),
+      child: const Icon(Icons.add, size: 30, color: Colors.white),
     );
   }
 
   Widget _buildBottomNavBar() {
-    const String homeRoute = '/home';
-    const String calendarRoute = '/calendar';
-    const String descriptionRoute = '/description';
-    const String settingsRoute = '/settings';
-    
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8.0,
@@ -307,18 +170,18 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            _buildNavItem(context, Icons.home, isSelected: false, routeName: homeRoute),
-            _buildNavItem(context, Icons.calendar_today, isSelected: true, routeName: calendarRoute), 
+            _buildNavItem(Icons.home, isSelected: false, routeName: '/home'),
+            _buildNavItem(Icons.calendar_today, isSelected: true, routeName: '/calendar'),
             const SizedBox(width: 40), 
-            _buildNavItem(context, Icons.description, isSelected: false, routeName: descriptionRoute),
-            _buildNavItem(context, Icons.settings, isSelected: false, routeName: settingsRoute),
+            _buildNavItem(Icons.description, isSelected: false, routeName: '/description'),
+            _buildNavItem(Icons.settings, isSelected: false, routeName: '/settings'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(BuildContext context, IconData icon, {bool isSelected = false, String? routeName}) {
+  Widget _buildNavItem(IconData icon, {bool isSelected = false, String? routeName}) {
     return IconButton(
       icon: Icon(
         icon,
@@ -327,9 +190,99 @@ class _CalendarTasksScreenState extends State<CalendarTasksScreen> {
       ),
       onPressed: () {
         if (routeName != null && !isSelected) {
-          Navigator.pushReplacementNamed(context, routeName);
+          Get.offNamed(routeName);
         }
       },
+    );
+  }
+}
+
+// --- TASK CARD WIDGET ---
+class TaskCard extends StatelessWidget {
+  final String title;
+  final String project;
+  final int progress;
+  final int total;
+  final String date;
+  final Color dateColor;
+  final Color progressColor;
+  final VoidCallback? onTap;
+
+  const TaskCard({
+    required this.title,
+    required this.project,
+    required this.progress,
+    required this.total,
+    required this.date,
+    required this.dateColor,
+    required this.progressColor,
+    this.onTap,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double progressPercentage = (total == 0) ? 0 : (progress / total);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: dateColor.withOpacity(0.4), width: 1), 
+          boxShadow: [
+            BoxShadow(color: Colors.grey.withOpacity(0.15), spreadRadius: 2, blurRadius: 10, offset: const Offset(0, 5)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Icon(Icons.more_horiz, color: Colors.grey),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(project, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+            const SizedBox(height: 15),
+            Row(
+              children: <Widget>[
+                const Icon(Icons.list_alt, size: 14, color: Colors.grey),
+                const SizedBox(width: 5),
+                const Text('Progress', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: progressPercentage,
+                      minHeight: 8,
+                      backgroundColor: Colors.grey.shade200,
+                      valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text('$progress/$total', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 15),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: dateColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(date, style: TextStyle(color: dateColor, fontWeight: FontWeight.bold, fontSize: 12)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

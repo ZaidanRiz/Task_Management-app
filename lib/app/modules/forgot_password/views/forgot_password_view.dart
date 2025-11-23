@@ -1,13 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class ForgotPasswordView extends StatelessWidget {
+class ForgotPasswordView extends StatefulWidget {
   const ForgotPasswordView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Kita pakai TextEditingController meski stateles, biasanya disimpan di state/controller terpisah
-    final emailController = TextEditingController();
+  State<ForgotPasswordView> createState() => _ForgotPasswordViewState();
+}
 
+class _ForgotPasswordViewState extends State<ForgotPasswordView> {
+  // Controller untuk menangkap input email
+  final _emailController = TextEditingController();
+
+  // LOGIKA RESET PASSWORD
+  void _handleResetPassword() async {
+    if (_emailController.text.isNotEmpty) {
+      
+      // 1. Tampilkan Notifikasi SUKSES
+      Get.snackbar(
+        "Email Terkirim",
+        "Link reset password telah dikirim ke email Anda.",
+        icon: const Icon(Icons.mark_email_read, color: Colors.white),
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
+        duration: const Duration(seconds: 3),
+      );
+
+      // 2. Delay sebentar
+      await Future.delayed(const Duration(milliseconds: 2000));
+
+      // 3. Kembali ke halaman Login otomatis
+      Get.back(); 
+
+    } else {
+      // Notifikasi ERROR jika email kosong
+      Get.snackbar(
+        "Gagal",
+        "Harap masukkan alamat email Anda.",
+        icon: const Icon(Icons.warning, color: Colors.white),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -16,7 +66,8 @@ class ForgotPasswordView extends StatelessWidget {
         // Tombol Back Custom (Panah kecil)
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          // Menggunakan GetX untuk kembali
+          onPressed: () => Get.back(),
         ),
       ),
       body: SafeArea(
@@ -29,14 +80,14 @@ class ForgotPasswordView extends StatelessWidget {
               
               // --- JUDUL HALAMAN ---
               const Text(
-                "Forgot your password?", // Sesuai teks di PDF [cite: 33, 76]
+                "Forgot your password?", 
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               
               // --- DESKRIPSI ---
               const Text(
-                "A code will be sent to your email to help reset password", // Sesuai teks di PDF [cite: 34, 77]
+                "A code will be sent to your email to help reset password",
                 style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
               
@@ -48,14 +99,14 @@ class ForgotPasswordView extends StatelessWidget {
                   Icon(Icons.email_outlined, size: 18, color: Colors.black54),
                   SizedBox(width: 8),
                   Text(
-                    "Email Address", // Sesuai teks di PDF [cite: 35, 78]
+                    "Email Address",
                     style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
               const SizedBox(height: 10),
               TextField(
-                controller: emailController,
+                controller: _emailController,
                 decoration: InputDecoration(
                   hintText: "Enter your email",
                   hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -79,20 +130,15 @@ class ForgotPasswordView extends StatelessWidget {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Tampilkan pesan sukses dummy
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Reset code sent to email!")),
-                    );
-                  },
+                  onPressed: _handleResetPassword, // Panggil logika di atas
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30), // Pill shape
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
                   child: const Text(
-                    "Reset Password", // Sesuai teks di PDF [cite: 37, 80]
+                    "Reset Password",
                     style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -103,7 +149,8 @@ class ForgotPasswordView extends StatelessWidget {
               // --- LINK BACK TO LOGIN ---
               Center(
                 child: TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  // Menggunakan GetX untuk kembali
+                  onPressed: () => Get.back(),
                   child: const Text(
                     "Back to login", 
                     style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),

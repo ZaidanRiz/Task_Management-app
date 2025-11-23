@@ -1,152 +1,132 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/app/modules/CreateTask/views/create_task_view.dart';
- 
+import 'package:get/get.dart';
+import '../controllers/detail_task_controller.dart';
 
-class DetailTaskView extends StatefulWidget {
+class DetailTaskView extends GetView<DetailTaskController> {
   const DetailTaskView({super.key});
-
-  @override
-  State<DetailTaskView> createState() => _DetailTaskViewState();
-}
-
-class _DetailTaskViewState extends State<DetailTaskView> {
-  // Data Dummy untuk Sub-tasks
-  // 'isChecked' digunakan untuk mengatur status centang
-  List<Map<String, dynamic>> subTasks = [
-    {'title': '#1 Search Refrences', 'isChecked': false},
-    {'title': '#2 Search Components', 'isChecked': false},
-    {'title': '#3 Create Wireframe', 'isChecked': false},
-    {'title': '#4 Define Color Palette & Typography', 'isChecked': false},
-    {'title': '#5 Design Key Screens', 'isChecked': false},
-    {'title': '#6 Add Interaction / Prototype in Figma', 'isChecked': false},
-    {'title': '#7 Review & Feedback', 'isChecked': false},
-    {'title': '#8 Revise & Improve Based on Feedback', 'isChecked': false},
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      
       // --- APP BAR ---
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Get.back(),
         ),
         title: const Text(
-          'RI Task',
-          style: TextStyle(
-            color: Colors.blue,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+          'RI Task', // Judul Project (Sesuai Gambar)
+          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_outlined, color: Colors.black87),
-            onPressed: () {
-              // Logika Edit Task
-            },
+            icon: const Icon(Icons.edit_outlined, color: Colors.black),
+            onPressed: () => controller.editTask(),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.black87),
-            onPressed: () {
-              // Logika Hapus Task
-            },
+            icon: const Icon(Icons.delete_outline, color: Colors.black),
+            onPressed: () => controller.deleteTask(),
           ),
           const SizedBox(width: 10),
         ],
       ),
-
-      // --- BODY ---
+      
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Judul Misi
-              const Text(
-                "Design new ui presentation",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+        child: Column(
+          children: [
+            // --- HEADER JUDUL TUGAS ---
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Design new ui presentation",
+                  style: TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold, 
+                    color: Colors.black87
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+            ),
 
-              // List Sub-tasks (Menggunakan spread operator ...)
-              ...subTasks.asMap().entries.map((entry) {
-                int index = entry.key;
-                Map<String, dynamic> task = entry.value;
-                return _buildSubTaskItem(index, task);
-              }),
-              
-              const SizedBox(height: 80), // Ruang untuk Bottom Nav
-            ],
-          ),
+            // --- LIST STEP (CHECKLIST) ---
+            Expanded(
+              child: Obx(() => ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                itemCount: controller.steps.length,
+                itemBuilder: (context, index) {
+                  final step = controller.steps[index];
+                  return _buildStepItem(
+                    title: step['title'], 
+                    isCompleted: step['isCompleted'],
+                    onTap: () => controller.toggleStep(index),
+                  );
+                },
+              )),
+            ),
+          ],
         ),
       ),
 
-      // --- BOTTOM NAVIGATION & FAB ---
-      floatingActionButton: _buildFAB(context),
+      // --- BOTTOM NAVIGATION BAR (Sesuai Gambar) ---
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {}, // Logika tambah step jika perlu
+        backgroundColor: Colors.blue,
+        elevation: 4.0,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add, size: 30, color: Colors.white),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: _buildBottomNavBar(context),
+      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
-  // Widget Item Sub-Task
-  Widget _buildSubTaskItem(int index, Map<String, dynamic> task) {
+  // Widget Item Checklist Custom (Kotak Biru)
+  Widget _buildStepItem({required String title, required bool isCompleted, required VoidCallback onTap}) {
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          // Mengubah status check ketika item ditekan
-          subTasks[index]['isChecked'] = !subTasks[index]['isChecked'];
-        });
-      },
+      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 15),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.lightBlueAccent), // Border biru sesuai gambar
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(
+            color: Colors.blue.withOpacity(0.5), // Warna Border Biru
+            width: 1.5
+          ),
         ),
         child: Row(
           children: [
-            // Checkbox Custom
+            // Custom Checkbox
             Container(
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: task['isChecked'] ? Colors.blue : Colors.lightBlueAccent,
-                  width: 2,
-                ),
-                color: task['isChecked'] ? Colors.blue : Colors.white,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Colors.blue, width: 1.5),
+                color: isCompleted ? Colors.blue : Colors.transparent,
               ),
-              child: task['isChecked']
-                  ? const Icon(Icons.check, size: 16, color: Colors.white)
-                  : null,
+              child: isCompleted 
+                ? const Icon(Icons.check, size: 16, color: Colors.white) 
+                : null,
             ),
             const SizedBox(width: 15),
-            
-            // Teks Task
+            // Teks Langkah
             Expanded(
               child: Text(
-                task['title'],
+                title,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
-                  decoration: task['isChecked'] ? TextDecoration.lineThrough : null, // Coret jika selesai
-                  decorationColor: Colors.grey,
+                  decoration: isCompleted ? TextDecoration.lineThrough : null, // Coret jika selesai
                 ),
               ),
             ),
@@ -156,53 +136,22 @@ class _DetailTaskViewState extends State<DetailTaskView> {
     );
   }
 
-  // Widget FAB
-  Widget _buildFAB(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        // Navigasi ke CreateTaskView
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CreateTaskView()),
-        );
-      },
-      backgroundColor: Colors.blue,
-      elevation: 4.0,
-      shape: const CircleBorder(),
-      child: const Icon(Icons.add, size: 30, color: Colors.white),
-    );
-  }
-
-  // Widget Bottom Navigation Bar
-  Widget _buildBottomNavBar(BuildContext context) {
+  // Widget Bottom Nav Bar (Dummy Visual Saja)
+  Widget _buildBottomNavBar() {
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8.0,
       color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: SizedBox(
+        height: 60,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home, color: Colors.grey), // Home jadi grey karena kita di Detail
-              onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
-            ),
-            IconButton(
-              icon: const Icon(Icons.calendar_today, color: Colors.grey),
-              onPressed: () => Navigator.pushReplacementNamed(context, '/calendar'),
-            ),
-            const SizedBox(width: 40), 
-            IconButton(
-              icon: const Icon(Icons.description, color: Colors.blue), // Icon ini aktif (Biru)
-              onPressed: () {
-                 // Sudah di halaman ini (atau halaman list task)
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.grey),
-              onPressed: () => Navigator.pushReplacementNamed(context, '/settings'),
-            ),
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(icon: const Icon(Icons.home, color: Colors.black54), onPressed: (){}),
+            IconButton(icon: const Icon(Icons.chat_bubble_outline, color: Colors.black54), onPressed: (){}),
+            const SizedBox(width: 40),
+            IconButton(icon: const Icon(Icons.description_outlined, color: Colors.black54), onPressed: (){}),
+            IconButton(icon: const Icon(Icons.settings_outlined, color: Colors.black54), onPressed: (){}),
           ],
         ),
       ),

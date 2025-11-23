@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -16,6 +17,55 @@ class _SignUpViewState extends State<SignUpView> {
   // State untuk sembunyikan password
   bool _isObscure = true;
 
+  // LOGIKA SIGN UP
+  void _handleSignUp() async {
+    // Validasi sederhana: Cek apakah semua field terisi
+    if (_usernameController.text.isNotEmpty && 
+        _emailController.text.isNotEmpty && 
+        _passwordController.text.isNotEmpty) {
+      
+      // 1. Tampilkan Notifikasi SUKSES
+      Get.snackbar(
+        "Berhasil Mendaftar",
+        "Akun Anda berhasil dibuat. Silakan login.",
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
+        duration: const Duration(seconds: 2),
+      );
+
+      // 2. Delay sebentar agar user membaca notifikasi
+      await Future.delayed(const Duration(milliseconds: 1500));
+
+      // 3. Arahkan ke halaman Login
+      Get.offNamed('/login'); 
+
+    } else {
+      // Notifikasi ERROR jika ada field kosong
+      Get.snackbar(
+        "Gagal Mendaftar",
+        "Harap isi semua data (Username, Email, Password)",
+        icon: const Icon(Icons.error, color: Colors.white),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+        borderRadius: 10,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +81,7 @@ class _SignUpViewState extends State<SignUpView> {
                 // --- BAGIAN HEADER ---
                 const Center(
                   child: Text(
-                    "Create Account", // Sesuai teks di PDF [cite: 14, 23]
+                    "Create Account",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -50,19 +100,18 @@ class _SignUpViewState extends State<SignUpView> {
                 const SizedBox(height: 30),
 
                 // --- INPUT USERNAME ---
-                // Label Username
                 Row(
                   children: const [
                     Icon(Icons.person_outline, size: 18, color: Colors.black54),
                     SizedBox(width: 8),
                     Text(
-                      "Your Username", // Sesuai teks di PDF [cite: 15, 24]
+                      "Your Username",
                       style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                // TextField Username
+                
                 TextField(
                   controller: _usernameController,
                   decoration: InputDecoration(
@@ -84,19 +133,18 @@ class _SignUpViewState extends State<SignUpView> {
                 const SizedBox(height: 20),
 
                 // --- INPUT EMAIL ---
-                // Label Email
                 Row(
                   children: const [
                     Icon(Icons.email_outlined, size: 18, color: Colors.black54),
                     SizedBox(width: 8),
                     Text(
-                      "Your email", // Sesuai teks di PDF [cite: 16, 26]
+                      "Your email",
                       style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                // TextField Email
+                
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -118,22 +166,21 @@ class _SignUpViewState extends State<SignUpView> {
                 const SizedBox(height: 20),
 
                 // --- INPUT PASSWORD ---
-                // Label Password
                 Row(
                   children: const [
                     Icon(Icons.lock_outline, size: 18, color: Colors.black54),
                     SizedBox(width: 8),
                     Text(
-                      "Password", // Sesuai teks di PDF [cite: 18, 28]
+                      "Password",
                       style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                // TextField Password
+                
                 TextField(
                   controller: _passwordController,
-                  obscureText: _isObscure, // Bisa di-hide/show
+                  obscureText: _isObscure,
                   decoration: InputDecoration(
                     hintText: "Create a password",
                     hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -166,18 +213,15 @@ class _SignUpViewState extends State<SignUpView> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Logika Sign Up Dummy
-                      Navigator.pushReplacementNamed(context, '/home');
-                    },
+                    onPressed: _handleSignUp, // Panggil fungsi di atas
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30), // Pill shape
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: const Text(
-                      "Sign Up", // Sesuai teks di PDF [cite: 19, 30]
+                      "Sign Up",
                       style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -189,11 +233,11 @@ class _SignUpViewState extends State<SignUpView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Already a user? "), // Sesuai teks di PDF [cite: 20, 31]
+                    const Text("Already a user? "),
                     GestureDetector(
                       onTap: () {
-                        // Kembali ke halaman Login (pop)
-                        Navigator.pop(context);
+                        // Kembali ke halaman Login (menggunakan GetX)
+                        Get.back();
                       },
                       child: const Text(
                         "Sign in",
@@ -209,4 +253,4 @@ class _SignUpViewState extends State<SignUpView> {
       ),
     );
   }
-}
+} 

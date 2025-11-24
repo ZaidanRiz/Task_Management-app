@@ -41,7 +41,7 @@ class HomeView extends GetView<HomeController> {
               const Text("Categories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 15),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildCategoryCard(
                     Icons.checklist, 
@@ -49,11 +49,10 @@ class HomeView extends GetView<HomeController> {
                     Colors.blue,
                     onTap: () => Get.toNamed('/description'),
                   ),
-                  _buildCategoryCard(Icons.games, "Task For Kids", Colors.orange),
                   _buildCategoryCard(Icons.lightbulb, "AI Assistant", Colors.yellow),
                 ],
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               // --- TODAY'S TASK (DYNAMIS) ---
               const Text("Today's task", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),

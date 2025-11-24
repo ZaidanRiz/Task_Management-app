@@ -54,5 +54,13 @@ Setelah instalasi selesai, Anda dapat menjalankan proyek dengan perintah berikut
 ## Low Fidelity Prototype :
 
 ## Tabel pembagian tugas (backlog) tiap anggota secara bergantian dengan level :
+Pembagian tugas dilakukan menggunakan metode *Agile/Scrum* dengan pembagian peran Product Owner dan Scrum Master yang bergantian berdasarkan fitur utama.
+
+| **Aplikasi Task Management** | | | |
+| :--- | :--- | :--- | :--- |
+| **Agile Organization** | **Fitur A**<br>*(Auth & Dashboard)* | **Fitur B**<br>*(Task Ops & Settings)* | **Fitur C**<br>*(Arch & Routing)* |
+| **Product Owner** | **Zaidan Rizqullah** | **M. Fauza Ramadhan** | **M. Ali Fathir** |
+| **Scrum Master** | **Mohammad Eka** | **M. Ali Fathir** | **Zaidan Rizqullah** |
+| **Tim Pengembangan** | M. Fauza Ramadhan<br>M. Ali Fathir<br>Mohammad Eka | Zaidan Rizqullah<br>Mohammad Eka<br>M. Ali Fathir | M. Fauza Ramadhan<br>Mohammad Eka<br>Zaidan Rizqullah |
 
 Terima kasih telah mengunjungi repository ini!

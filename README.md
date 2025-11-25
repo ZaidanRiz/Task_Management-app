@@ -49,10 +49,6 @@ Setelah instalasi selesai, Anda dapat menjalankan proyek dengan perintah berikut
 
 ## Link Figma : https://www.figma.com/design/A18XghnSdgislIBIbpziTs/Project-Rekayasa-Interaksi-New?node-id=123-10205&t=Ow4YAuzL0fiEt7v0-1
 
-## Worksheet :
-
-## Low Fidelity Prototype :
-
 ## Tabel pembagian tugas (backlog) tiap anggota secara bergantian dengan level :
 Pembagian tugas dilakukan menggunakan metode *Agile/Scrum* dengan pembagian peran Product Owner dan Scrum Master yang bergantian berdasarkan fitur utama.
 

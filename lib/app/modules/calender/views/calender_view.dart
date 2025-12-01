@@ -171,7 +171,7 @@ class CalendarView extends GetView<CalendarController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             _buildNavItem(Icons.home, isSelected: false, routeName: '/home'),
-            _buildNavItem(Icons.calendar_today, isSelected: true, routeName: '/calendar'),
+            _buildNavItem(Icons.calendar_month, isSelected: true, routeName: '/calendar'),
             const SizedBox(width: 40), 
             _buildNavItem(Icons.description, isSelected: false, routeName: '/description'),
             _buildNavItem(Icons.settings, isSelected: false, routeName: '/settings'),

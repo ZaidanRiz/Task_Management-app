@@ -41,11 +41,11 @@ class CreateTaskView extends GetView<CreateTaskController> {
             const Text('Steps', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 10),
             
-            _buildTextField(hint: 'Masukkan Sub Task'),
+            _buildTextField(hint: 'Masukkan Sub Task', controller: controller.stepController),
             const SizedBox(height: 10),
-            _buildTextField(hint: 'Masukkan Sub Task'),
+            _buildTextField(hint: 'Masukkan Sub Task',),
             const SizedBox(height: 10),
-            _buildTextField(hint: 'Masukkan Sub Task'),
+            _buildTextField(hint: 'Masukkan Sub Task',),
             
             const SizedBox(height: 20),
             const Text('Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -131,40 +131,49 @@ class CreateTaskView extends GetView<CreateTaskController> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Berikan Notifikasi Setiap:', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-              const SizedBox(height: 10),
-              
-              Obx(() => Row(
-                children: List.generate(controller.daysLabel.length, (index) {
-                  bool isSelected = controller.selectedDays[index];
-
-                  return GestureDetector(
-                    onTap: () => controller.toggleDay(index),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      width: 30,
-                      height: 30,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.blue : Colors.transparent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        controller.daysLabel[index],
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.grey,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          // --- PERBAIKAN DI SINI ---
+          // Bungkus Column dengan Expanded agar tidak overflow
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Berikan Notifikasi Setiap:', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                const SizedBox(height: 10),
+                
+                // Obx untuk membuat UI reaktif
+                Obx(() => Wrap( // Ganti Row jadi Wrap (opsional) atau biarkan Row tapi pastikan muat
+                  spacing: 8, // Jarak antar item (pengganti margin only right)
+                  children: List.generate(controller.daysLabel.length, (index) {
+                    bool isSelected = controller.selectedDays[index];
+            
+                    return GestureDetector(
+                      onTap: () => controller.toggleDay(index),
+                      child: Container(
+                        // Hapus margin di sini, gunakan spacing dari Wrap atau biarkan jika pakai Row
+                        // margin: const EdgeInsets.only(right: 8), 
+                        width: 30,
+                        height: 30,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.blue : Colors.transparent,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          controller.daysLabel[index],
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.grey,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }),
-              )),
-            ],
+                    );
+                  }),
+                )),
+              ],
+            ),
           ),
+          
+          const SizedBox(width: 10), // Jarak sedikit antara hari dan ikon
           const Icon(Icons.notifications_active_outlined, color: Colors.orange, size: 30),
         ],
       ),

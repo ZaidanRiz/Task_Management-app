@@ -10,6 +10,7 @@ class CreateTaskController extends GetxController {
   // Controller untuk TextFields
   final titleController = TextEditingController();
   final dateController = TextEditingController();
+  final stepController = TextEditingController();
   
   // Data Label Hari
   final List<String> daysLabel = ['M', 'S', 'S', 'R', 'K', 'J', 'S'];
@@ -24,11 +25,11 @@ class CreateTaskController extends GetxController {
 
   // Fungsi Submit (Simpan Data)
   void submitTask() {
-    // A. Validasi Input
-    if (titleController.text.isEmpty) {
+    // 1. UPDATE VALIDASI: Cek Title ATAU Step ATAU Date
+    if (titleController.text.isEmpty || stepController.text.isEmpty || dateController.text.isEmpty) {
       Get.snackbar(
         "Gagal",
-        "Nama misi tidak boleh kosong",
+        "Nama Tugas, Sub Tugas, dan Deadline Tanggal tidak boleh kosong", // <-- Pesan disesuaikan
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP,
@@ -38,22 +39,19 @@ class CreateTaskController extends GetxController {
       return;
     }
 
-    // B. Membuat Objek Task Baru
     final newTask = TaskModel(
       title: titleController.text,
-      project: "Personal", // Bisa diubah jadi inputan user jika mau
-      progress: 0,         // Task baru mulai dari 0
-      total: 10,           // Total steps default (bisa diubah nanti)
-      // Gunakan tanggal inputan, atau default ke hari ini jika kosong
-      date: dateController.text.isEmpty ? "Today" : dateController.text,
-      dateColor: Colors.blue,      // Warna default
-      progressColor: Colors.blue,  // Warna default
+      project: "Personal", 
+      progress: 0,        
+      total: 10,          
+      // Karena sudah divalidasi tidak kosong, kita bisa pakai text langsung
+      date: dateController.text, 
+      dateColor: Colors.blue,      
+      progressColor: Colors.blue,  
     );
 
-    // C. Simpan ke Global Controller
     globalTaskController.addTask(newTask);
 
-    // D. Feedback ke User & Tutup Halaman
     Get.snackbar(
       "Berhasil",
       "Task '${titleController.text}' berhasil ditambahkan!",
@@ -65,9 +63,8 @@ class CreateTaskController extends GetxController {
       duration: const Duration(seconds: 1),
     );
 
-    // Delay sedikit sebelum menutup halaman agar notifikasi terlihat
     Future.delayed(const Duration(milliseconds: 1200), () {
-      Get.back(); // Kembali ke halaman sebelumnya
+      Get.back();
     });
   }
 

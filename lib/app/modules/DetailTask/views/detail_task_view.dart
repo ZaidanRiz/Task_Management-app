@@ -135,26 +135,52 @@ class DetailTaskView extends GetView<DetailTaskController> {
       ),
     );
   }
-
-  // Widget Bottom Nav Bar (Dummy Visual Saja)
+  // Widget Bottom Nav Bar
   Widget _buildBottomNavBar() {
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
       notchMargin: 8.0,
       color: Colors.white,
-      child: SizedBox(
-        height: 60,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(icon: const Icon(Icons.home, color: Colors.black54), onPressed: (){}),
-            IconButton(icon: const Icon(Icons.chat_bubble_outline, color: Colors.black54), onPressed: (){}),
-            const SizedBox(width: 40),
-            IconButton(icon: const Icon(Icons.description_outlined, color: Colors.black54), onPressed: (){}),
-            IconButton(icon: const Icon(Icons.settings_outlined, color: Colors.black54), onPressed: (){}),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            // Home
+            _buildNavItem(Icons.home, isSelected: false, routeName: '/home'),
+            
+            // Calendar
+            _buildNavItem(Icons.calendar_month, isSelected: false, routeName: '/calendar'),
+            
+            const SizedBox(width: 40), // Spasi untuk FAB (+)
+            
+            // All Tasks (Description)
+            // Kita arahkan kembali ke /description
+            _buildNavItem(Icons.description, isSelected: false, routeName: '/description'),
+            
+            // Settings
+            _buildNavItem(Icons.settings, isSelected: false, routeName: '/settings'),
           ],
         ),
       ),
+    );
+  }
+
+  // 2. Widget Helper Item Navigasi (Sama persis dengan AllTasksView)
+  Widget _buildNavItem(IconData icon, {bool isSelected = false, String? routeName}) {
+    return IconButton(
+      icon: Icon(
+        icon,
+        color: isSelected ? Colors.blue : Colors.black54,
+        size: 24,
+      ),
+      onPressed: () {
+        if (routeName != null) {
+          // Menggunakan Get.offNamed agar halaman Detail ditutup 
+          // dan digantikan oleh halaman tujuan (agar tidak menumpuk di memori)
+          Get.offNamed(routeName);
+        }
+      },
     );
   }
 }

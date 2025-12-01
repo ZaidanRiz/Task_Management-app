@@ -8,6 +8,9 @@ abstract class Routes {
   static const SETTINGS = _Paths.SETTINGS;
   static const CREATE_TASK = _Paths.CREATE_TASK;
   static const DETAIL_TASK = _Paths.DETAIL_TASK;
+  static const ONBOARDING = _Paths.ONBOARDING;
+  static const AI_ASSISTANT = _Paths.AI_ASSISTANT;
+  static const EDIT_PROFILE = _Paths.EDIT_PROFILE;
 }
 
 abstract class _Paths {
@@ -17,4 +20,7 @@ abstract class _Paths {
   static const SETTINGS = '/settings';
   static const CREATE_TASK = '/create-task';
   static const DETAIL_TASK = '/detail-task';
+  static const ONBOARDING = '/onboarding';
+  static const AI_ASSISTANT = '/ai-assistant';
+  static const EDIT_PROFILE = '/edit-profile';
 }

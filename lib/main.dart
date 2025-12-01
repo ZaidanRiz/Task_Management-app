@@ -16,6 +16,12 @@ import 'app/modules/calender/views/calender_view.dart';
 import 'package:task_management_app/app/modules/calender/bindings/calendar_binding.dart';
 import 'package:task_management_app/app/modules/DetailTask/views/detail_task_view.dart';
 import 'package:task_management_app/app/modules/DetailTask/bindings/detail_task_binding.dart';
+import 'package:task_management_app/app/modules/onboarding/bindings/onboarding_binding.dart';
+import 'package:task_management_app/app/modules/onboarding/views/onboarding_view.dart';
+import 'package:task_management_app/app/modules/AiAssistant/bindings/ai_assistant_binding.dart';
+import 'package:task_management_app/app/modules/AiAssistant/views/ai_assistant_view.dart';
+import 'package:task_management_app/app/modules/EditProfile/bindings/edit_profile_binding.dart';
+import 'package:task_management_app/app/modules/EditProfile/views/edit_profile_view.dart';
 
 void main() {
   Get.put(TaskController());
@@ -35,7 +41,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
         useMaterial3: true,
       ),
-      initialRoute: '/login',
+      initialRoute: '/onboarding',
 
       // --- PENGATURAN TRANSISI DEFAULT ---
       // Ini akan membuat SEMUA perpindahan halaman memiliki animasi ini
@@ -44,7 +50,10 @@ class MyApp extends StatelessWidget {
 
       // --- UBAH 'routes' MENJADI 'getPages' ---
       getPages: [
-        GetPage(name: '/login', page: () => const LoginView()),
+        GetPage(
+          name: '/login',
+          page: () => const LoginView(),
+        ),
         GetPage(
           name: '/home',
           page: () => const HomeView(),
@@ -76,6 +85,21 @@ class MyApp extends StatelessWidget {
           name: '/detail-task',
           page: () => const DetailTaskView(),
           binding: DetailTaskBinding(),
+        ),
+        GetPage(
+          name: '/onboarding',
+          page: () => const OnboardingView(),
+          binding: OnboardingBinding(),
+        ),
+        GetPage(
+          name: '/ai-assistant',
+          page: () => const AiAssistantView(),
+          binding: AiAssistantBinding(),
+        ),
+        GetPage(
+          name: '/edit-profile',
+          page: () => const EditProfileView(),
+          binding: EditProfileBinding(),
         ),
       ],
     );

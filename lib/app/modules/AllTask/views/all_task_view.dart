@@ -111,7 +111,7 @@ class AllTasksView extends GetView<AllTaskController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             _buildNavItem(Icons.home, isSelected: false, routeName: '/home'),
-            _buildNavItem(Icons.calendar_today, isSelected: false, routeName: '/calendar'), 
+            _buildNavItem(Icons.calendar_month, isSelected: false, routeName: '/calendar'), 
             const SizedBox(width: 40), 
             _buildNavItem(Icons.description, isSelected: true, routeName: '/description'), // Aktif
             _buildNavItem(Icons.settings, isSelected: false, routeName: '/settings'),

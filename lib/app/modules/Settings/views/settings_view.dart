@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
-  // Konstanta Rute (Tetap disimpan untuk referensi, tapi dipanggil pakai String di GetX)
+  // Konstanta Rute
   static const String homeRoute = '/home';
   static const String calendarRoute = '/calendar';
   static const String descriptionRoute = '/description';
@@ -34,7 +34,7 @@ class SettingsView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- 1. HEADER PROFIL ---
+              // --- 1. HEADER PROFIL (BISA DIKLIK) ---
               _buildProfileHeader(),
               
               const SizedBox(height: 30),
@@ -51,7 +51,6 @@ class SettingsView extends StatelessWidget {
                 icon: Icons.notifications,
                 title: 'Notifications',
                 onTap: () {
-                  // GetX Snackbar
                   Get.snackbar(
                     "Notifications", 
                     "Notification settings clicked",
@@ -108,41 +107,47 @@ class SettingsView extends StatelessWidget {
         // Hapus semua rute dan kembali ke login
         Get.offAllNamed('/login'); 
       },
-      onCancel: () {
-        // GetX otomatis menutup dialog, tidak perlu code tambahan
-      }
     );
   }
 
-  // Widget Header Profil
+  // Widget Header Profil (UPDATED: Bisa Diklik)
   Widget _buildProfileHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.person_pin, size: 40, color: Colors.black87),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                'Zaidan Rizqullah', // Nama Dummy
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                '24, November 2025', 
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ],
-          ),
-        ],
+    return GestureDetector( // 1. Bungkus dengan GestureDetector
+      onTap: () {
+        // 2. Navigasi ke halaman Edit Profile
+        Get.toNamed('/edit-profile');
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
+          ],
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.person_pin, size: 40, color: Colors.black87),
+            const SizedBox(width: 15),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Zaidan Rizqullah', // Nama Dummy
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '24, November 2025', 
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+            const Spacer(),
+            // 3. Icon Edit sebagai penanda visual
+            const Icon(Icons.edit, color: Colors.grey),
+          ],
+        ),
       ),
     );
   }
@@ -185,7 +190,6 @@ class SettingsView extends StatelessWidget {
   Widget _buildFAB() {
     return FloatingActionButton(
       onPressed: () {
-        // GetX Navigasi ke CreateTask
         Get.toNamed('/create-task');
       },
       backgroundColor: Colors.blue,
@@ -207,8 +211,8 @@ class SettingsView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             _buildNavItem(Icons.home, isSelected: false, routeName: homeRoute),
-            _buildNavItem(Icons.calendar_today, isSelected: false, routeName: calendarRoute),
-            const SizedBox(width: 40), // Spasi untuk FAB
+            _buildNavItem(Icons.calendar_month, isSelected: false, routeName: calendarRoute), // Note: calendar_month or calendar_today depending on your pref
+            const SizedBox(width: 40), 
             _buildNavItem(Icons.description, isSelected: false, routeName: descriptionRoute),
             _buildNavItem(Icons.settings, isSelected: true, routeName: settingsRoute), // Aktif
           ],
@@ -227,7 +231,6 @@ class SettingsView extends StatelessWidget {
       ),
       onPressed: () {
         if (routeName != null && !isSelected) {
-          // GetX: Pindah halaman tanpa animasi numpuk (OffNamed)
           Get.offNamed(routeName);
         }
       },

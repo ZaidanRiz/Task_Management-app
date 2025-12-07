@@ -2,9 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/create_task_controller.dart';
 
-// Menggunakan GetView memudahkan akses ke controller
 class CreateTaskView extends GetView<CreateTaskController> {
   const CreateTaskView({super.key});
+
+  Future<void> _selectDate(BuildContext context, CreateTaskController controller) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: controller.selectedDateTime.value, 
+      firstDate: DateTime.now(), 
+      lastDate: DateTime(2101),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.blue, 
+              onPrimary: Colors.white,
+              onSurface: Colors.black, 
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      controller.setSelectedDate(picked); 
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,18 +76,22 @@ class CreateTaskView extends GetView<CreateTaskController> {
             const Text('Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 10),
             
-            _buildTextField(
-              hint: 'Masukkan Tanggal Deadline (DD/MM/YY)', 
-              suffixIcon: Icons.calendar_today, 
-              isRedIcon: true,
-              controller: controller.dateController
-            ),
+            Obx(() {
+                var _ = controller.selectedDateTime.value; 
+                return _buildTextField(
+                    hint: 'Pilih Tanggal Deadline (Contoh: 16 Oct)', 
+                    suffixIcon: Icons.calendar_today, 
+                    isRedIcon: true,
+                    controller: controller.dateController,
+                    onTap: () => _selectDate(context, controller), 
+                    readOnly: true,
+                );
+            }),
             
             const SizedBox(height: 20),
             const Text('Reminder', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 10),
             
-            // Panggil Widget Reminder
             _buildReminderBox(),
             
             const SizedBox(height: 30),
@@ -82,18 +111,33 @@ class CreateTaskView extends GetView<CreateTaskController> {
                   ),
                 ),
                 const SizedBox(width: 20),
-                Expanded(
+                
+                // --- TOMBOL CONTINUE DENGAN LOADING STATE ---
+                Obx(() => Expanded(
                   child: ElevatedButton(
-                    onPressed: () => controller.submitTask(), // Akses fungsi controller
+                    // Tombol dinonaktifkan jika sedang loading
+                    onPressed: controller.isLoading.isTrue 
+                      ? null 
+                      : () => controller.submitTask(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text('Continue'),
+                    child: controller.isLoading.isTrue
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                        : const Text('Continue'),
                   ),
-                ),
+                )),
+                // --- END TOMBOL LOADING ---
               ],
             ),
           ],
@@ -102,14 +146,19 @@ class CreateTaskView extends GetView<CreateTaskController> {
     );
   }
 
+  // Widget _buildTextField
   Widget _buildTextField({
     required String hint, 
     IconData? suffixIcon, 
     bool isRedIcon = false,
-    TextEditingController? controller
+    TextEditingController? controller,
+    VoidCallback? onTap, 
+    bool readOnly = false,
   }) {
     return TextField(
       controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
@@ -121,6 +170,7 @@ class CreateTaskView extends GetView<CreateTaskController> {
     );
   }
 
+  // Widget _buildReminderBox
   Widget _buildReminderBox() {
     return Container(
       padding: const EdgeInsets.all(15),
@@ -131,8 +181,6 @@ class CreateTaskView extends GetView<CreateTaskController> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // --- PERBAIKAN DI SINI ---
-          // Bungkus Column dengan Expanded agar tidak overflow
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,17 +188,14 @@ class CreateTaskView extends GetView<CreateTaskController> {
                 Text('Berikan Notifikasi Setiap:', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
                 const SizedBox(height: 10),
                 
-                // Obx untuk membuat UI reaktif
-                Obx(() => Wrap( // Ganti Row jadi Wrap (opsional) atau biarkan Row tapi pastikan muat
-                  spacing: 8, // Jarak antar item (pengganti margin only right)
+                Obx(() => Wrap( 
+                  spacing: 8,
                   children: List.generate(controller.daysLabel.length, (index) {
                     bool isSelected = controller.selectedDays[index];
             
                     return GestureDetector(
                       onTap: () => controller.toggleDay(index),
                       child: Container(
-                        // Hapus margin di sini, gunakan spacing dari Wrap atau biarkan jika pakai Row
-                        // margin: const EdgeInsets.only(right: 8), 
                         width: 30,
                         height: 30,
                         alignment: Alignment.center,
@@ -173,7 +218,7 @@ class CreateTaskView extends GetView<CreateTaskController> {
             ),
           ),
           
-          const SizedBox(width: 10), // Jarak sedikit antara hari dan ikon
+          const SizedBox(width: 10),
           const Icon(Icons.notifications_active_outlined, color: Colors.orange, size: 30),
         ],
       ),

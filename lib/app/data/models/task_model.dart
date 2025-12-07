@@ -9,6 +9,9 @@ class TaskModel {
   Color progressColor;
   List<Map<String, dynamic>> todos; // Menyimpan langkah-langkah
 
+  
+
+
   TaskModel({
     required this.id,
     required this.title,

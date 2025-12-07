@@ -1,6 +1,10 @@
+// Path: lib/app/modules/calendar/views/calendar_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/calendar_controller.dart';
+import '../controllers/calendar_controller.dart'; 
+// Asumsi TaskCard, TaskModel, dan isSameDay ada.
+import 'package:intl/intl.dart';
 
 class CalendarView extends GetView<CalendarController> {
   const CalendarView({super.key});
@@ -30,35 +34,41 @@ class CalendarView extends GetView<CalendarController> {
             child: _buildCalendarWidget(),
           ),
 
-          // 2. Judul
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-            child: Text(
-              "Today's task",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+          // 2. Judul Tasks (Reaktif)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            child: Obx(() => Text(
+              "Tasks on ${controller.selectedDay} ${_monthName(controller.selectedDate.value.month)} ${controller.selectedDate.value.year}", 
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            )),
           ),
 
           // 3. Daftar Tugas (Reaktif dengan Obx)
           Expanded(
-            child: Obx(() => ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: controller.displayedTasks.length,
-              itemBuilder: (context, index) {
-                final task = controller.displayedTasks[index];
-                
-                return TaskCard( 
-                  title: task.title,           // Akses Property Model
-                  project: task.project,
-                  progress: task.progress,
-                  total: task.total,
-                  date: task.date,
-                  dateColor: task.dateColor,
-                  progressColor: task.progressColor,
-                  onTap: () => Get.toNamed('/detail-task', arguments: task),
+            child: Obx(() {
+                if (controller.displayedTasks.isEmpty) {
+                    return const Center(child: Text("Tidak ada tugas terjadwal pada tanggal ini."));
+                }
+                return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: controller.displayedTasks.length, 
+                    itemBuilder: (context, index) {
+                        final task = controller.displayedTasks[index];
+                        
+                        // Asumsi TaskCard tersedia
+                        return TaskCard( 
+                            title: task.title, 
+                            project: task.project,
+                            progress: task.progress,
+                            total: task.total,
+                            date: task.date, 
+                            dateColor: task.dateColor,
+                            progressColor: task.progressColor,
+                            onTap: () => Get.toNamed('/detail-task', arguments: task),
+                        );
+                    },
                 );
-              },
-            )),
+            }),
           ),
         ],
       ),
@@ -72,8 +82,7 @@ class CalendarView extends GetView<CalendarController> {
   // --- WIDGET HELPER ---
 
   Widget _buildCalendarWidget() {
-    final List<String> daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    final List<int> daysOfMonth = [0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 0, 0, 0, 0]; 
+    final List<String> daysOfWeek = ['MIN', 'SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB']; 
 
     return Container(
       padding: const EdgeInsets.all(15),
@@ -84,18 +93,29 @@ class CalendarView extends GetView<CalendarController> {
       ),
       child: Column(
         children: [
-          const Row(
+          // Navigasi Bulan/Tahun
+          Obx(() => Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Icon(Icons.arrow_back_ios, size: 16, color: Colors.black54),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.0),
-                child: Text('30 October 2025', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios, size: 16, color: Colors.black54),
+                onPressed: () => controller.changeMonth(-1),
               ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Text(
+                  '${_monthName(controller.selectedDate.value.month)} ${controller.selectedDate.value.year}', 
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
+                onPressed: () => controller.changeMonth(1),
+              ),
             ],
-          ),
+          )),
           const SizedBox(height: 20),
+          // Header Hari dalam Seminggu
           Table(
             children: [
               TableRow(
@@ -109,45 +129,70 @@ class CalendarView extends GetView<CalendarController> {
             ],
           ),
           
-          Obx(() => Table(
-            border: TableBorder.all(color: Colors.transparent),
-            children: List.generate((daysOfMonth.length / 7).ceil(), (row) {
-              return TableRow(
-                children: List.generate(7, (col) {
-                  final index = row * 7 + col;
-                  if (index >= daysOfMonth.length || daysOfMonth[index] == 0) {
-                    return Container(height: 30); 
-                  }
-                  
-                  final day = daysOfMonth[index];
-                  bool isSelected = day == controller.selectedDay.value;
-                  
-                  return GestureDetector( 
-                    onTap: () => controller.changeDate(day),
-                    child: Container(
-                      height: 30,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isSelected ? Colors.blue : Colors.transparent,
-                      ),
-                      child: Text(
-                        day.toString(),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isSelected ? Colors.white : Colors.black87,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          // Grid Hari
+          Obx(() {
+            final daysOfMonth = controller.daysOfMonthGrid;
+            
+            return Table(
+              border: TableBorder.all(color: Colors.transparent),
+              children: List.generate((daysOfMonth.length / 7).ceil(), (row) {
+                return TableRow(
+                  children: List.generate(7, (col) {
+                    final index = row * 7 + col;
+                    
+                    if (index >= daysOfMonth.length || daysOfMonth[index] == 0) {
+                      return Container(height: 30); 
+                    }
+                    
+                    final day = daysOfMonth[index];
+                    bool isSelected = day == controller.selectedDay;
+                    
+                    return GestureDetector( 
+                      onTap: () => controller.changeDate(day),
+                      child: Container(
+                        height: 30,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isSelected ? Colors.blue : Colors.transparent,
+                        ),
+                        child: Text(
+                          day.toString(),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isSelected ? Colors.white : Colors.black87,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }),
-              );
-            }),
-          )),
+                    );
+                  }),
+                );
+              }),
+            );
+          }),
         ],
       ),
     );
+  }
+  
+  // Helper untuk menampilkan nama bulan dalam Bahasa Indonesia
+  String _monthName(int month) {
+    switch (month) {
+      case 1: return 'Januari';
+      case 2: return 'Februari';
+      case 3: return 'Maret';
+      case 4: return 'April';
+      case 5: return 'Mei';
+      case 6: return 'Juni';
+      case 7: return 'Juli';
+      case 8: return 'Agustus';
+      case 9: return 'September';
+      case 10: return 'Oktober';
+      case 11: return 'November';
+      case 12: return 'Desember';
+      default: return 'Bulan Tidak Valid';
+    }
   }
 
   Widget _buildFAB() {

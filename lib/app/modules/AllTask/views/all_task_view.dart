@@ -35,9 +35,14 @@ class AllTasksView extends GetView<AllTaskController> {
               _buildTaskHeader("Today's task"),
               
               // Gunakan Obx agar list update otomatis saat data global berubah
-              Obx(() => Column(
-                children: controller.todayTasks.map((task) => _buildTaskCard(task)).toList(),
-              )),
+              Obx(() {
+                if (controller.todayTasks.isEmpty) {
+                  return const Center(child: Text("Tidak ada tugas hari ini."));
+                }
+                return Column(
+                  children: controller.todayTasks.map((task) => _buildTaskCard(task)).toList(),
+                );
+              }),
 
               const SizedBox(height: 20),
 
@@ -45,9 +50,16 @@ class AllTasksView extends GetView<AllTaskController> {
               _buildTaskHeader("Upcoming task"),
               
               // Gunakan Obx agar list update otomatis saat data global berubah
-              Obx(() => Column(
-                children: controller.upcomingTasks.map((task) => _buildTaskCard(task)).toList(),
-              )),
+              Obx(() {
+                if (controller.upcomingTasks.isEmpty && controller.todayTasks.isNotEmpty) {
+                    return const Center(child: Text("Tidak ada tugas yang akan datang."));
+                } else if (controller.upcomingTasks.isEmpty && controller.todayTasks.isEmpty) {
+                    return const Center(child: Text("Buat tugas baru melalui tombol '+'"));
+                }
+                return Column(
+                  children: controller.upcomingTasks.map((task) => _buildTaskCard(task)).toList(),
+                );
+              }),
               
               const SizedBox(height: 100), 
             ],
@@ -75,7 +87,7 @@ class AllTasksView extends GetView<AllTaskController> {
 
   Widget _buildTaskCard(TaskModel task) {
     return TaskCard(
-      title: task.title,           // Akses Property Model
+      title: task.title, 
       project: task.project,
       progress: task.progress,
       total: task.total,
@@ -162,7 +174,6 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Pastikan konversi ke double agar pembagian tidak error
     double progressPercentage = (total == 0) ? 0 : (progress / total);
 
     return GestureDetector(

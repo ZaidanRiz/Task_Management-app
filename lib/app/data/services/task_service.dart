@@ -1,15 +1,17 @@
+// Path: lib/app/data/services/task_service.dart
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/task_model.dart';
 
 class TaskService {
-  // Ini adalah simulasi database di server
+  // Simulasikan tanggal tugas di masa depan (misal tahun 2025)
   final List<TaskModel> _dummyDatabase = [
     TaskModel(
       id: '1',
       title: 'Design new ui presentation',
       project: 'RI Task',
-      date: '7 Nov 2025',
+      date: '7 Nov 2025', // Harus konsisten dengan parsing 'd MMM yyyy'
       dateColor: Colors.red,
       progressColor: Colors.green,
       todos: [
@@ -30,21 +32,27 @@ class TaskService {
         {'title': 'Prototyping', 'isCompleted': true},
       ],
     ),
+    // Tugas Tambahan (misal di bulan Desember 2025)
+    TaskModel(
+      id: '3',
+      title: 'Final Project Submission',
+      project: 'University',
+      date: '10 Dec 2025',
+      dateColor: Colors.purple,
+      progressColor: Colors.blue,
+      todos: [
+        {'title': 'Write report', 'isCompleted': false},
+      ],
+    ),
   ];
 
-  // FUNGSI GET (READ) - Simulasi ambil data dari API
   Future<List<TaskModel>> fetchTasks() async {
-    // Simulasi delay jaringan (tunggu 2 detik seolah-olah download data)
     await Future.delayed(const Duration(seconds: 2));
-    
-    // Kembalikan data
     return _dummyDatabase;
   }
 
-  // FUNGSI POST (CREATE) - Simulasi kirim data ke API
   Future<bool> addTask(TaskModel task) async {
     await Future.delayed(const Duration(seconds: 1));
-    // Di backend asli, di sini kita kirim HTTP POST
-    return true; // Berhasil
+    return true;
   }
 }

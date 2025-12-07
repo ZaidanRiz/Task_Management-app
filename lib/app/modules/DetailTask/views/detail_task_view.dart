@@ -17,9 +17,9 @@ class DetailTaskView extends GetView<DetailTaskController> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () => Get.back(),
         ),
-        title: const Text(
-          'RI Task', // Judul Project (Sesuai Gambar)
-          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+        title: Text(
+          controller.task.project, // Judul Project Dinamis (misal: 'RI Task')
+          style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
@@ -39,13 +39,14 @@ class DetailTaskView extends GetView<DetailTaskController> {
         child: Column(
           children: [
             // --- HEADER JUDUL TUGAS ---
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
               child: Align(
                 alignment: Alignment.centerLeft,
+                // Judul Tugas Dinamis (misal: 'Design new ui...')
                 child: Text(
-                  "Design new ui presentation",
-                  style: TextStyle(
+                  controller.task.title, 
+                  style: const TextStyle(
                     fontSize: 20, 
                     fontWeight: FontWeight.bold, 
                     color: Colors.black87
@@ -56,26 +57,38 @@ class DetailTaskView extends GetView<DetailTaskController> {
 
             // --- LIST STEP (CHECKLIST) ---
             Expanded(
-              child: Obx(() => ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                itemCount: controller.steps.length,
-                itemBuilder: (context, index) {
-                  final step = controller.steps[index];
-                  return _buildStepItem(
-                    title: step['title'], 
-                    isCompleted: step['isCompleted'],
-                    onTap: () => controller.toggleStep(index),
-                  );
-                },
-              )),
+              child: Obx(() {
+                // Mencari data tugas terbaru dari Global Controller agar reaktif
+                // (Jika user mencentang, UI langsung berubah)
+                var currentTask = controller.globalTaskController.tasks.firstWhere(
+                  (element) => element.id == controller.task.id, 
+                  orElse: () => controller.task
+                );
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  // Menggunakan 'todos' dari TaskModel
+                  itemCount: currentTask.todos.length, 
+                  itemBuilder: (context, index) {
+                    final step = currentTask.todos[index];
+                    return _buildStepItem(
+                      title: step['title'], 
+                      isCompleted: step['isCompleted'],
+                      onTap: () => controller.toggleStep(index),
+                    );
+                  },
+                );
+              }),
             ),
           ],
         ),
       ),
 
-      // --- BOTTOM NAVIGATION BAR (Sesuai Gambar) ---
+      // --- BOTTOM NAVIGATION BAR ---
       floatingActionButton: FloatingActionButton(
-        onPressed: () {}, // Logika tambah step jika perlu
+        onPressed: () {
+           // Tambah logika add step jika diperlukan nanti
+        }, 
         backgroundColor: Colors.blue,
         elevation: 4.0,
         shape: const CircleBorder(),
@@ -135,6 +148,7 @@ class DetailTaskView extends GetView<DetailTaskController> {
       ),
     );
   }
+
   // Widget Bottom Nav Bar
   Widget _buildBottomNavBar() {
     return BottomAppBar(
@@ -155,7 +169,6 @@ class DetailTaskView extends GetView<DetailTaskController> {
             const SizedBox(width: 40), // Spasi untuk FAB (+)
             
             // All Tasks (Description)
-            // Kita arahkan kembali ke /description
             _buildNavItem(Icons.description, isSelected: false, routeName: '/description'),
             
             // Settings
@@ -166,7 +179,7 @@ class DetailTaskView extends GetView<DetailTaskController> {
     );
   }
 
-  // 2. Widget Helper Item Navigasi (Sama persis dengan AllTasksView)
+  // Widget Helper Item Navigasi
   Widget _buildNavItem(IconData icon, {bool isSelected = false, String? routeName}) {
     return IconButton(
       icon: Icon(
@@ -177,7 +190,6 @@ class DetailTaskView extends GetView<DetailTaskController> {
       onPressed: () {
         if (routeName != null) {
           // Menggunakan Get.offNamed agar halaman Detail ditutup 
-          // dan digantikan oleh halaman tujuan (agar tidak menumpuk di memori)
           Get.offNamed(routeName);
         }
       },

@@ -83,7 +83,7 @@ class AllTasksView extends GetView<AllTaskController> {
       dateColor: task.dateColor,
       progressColor: task.progressColor,
       onTap: () {
-        Get.toNamed('/detail-task'); 
+        Get.toNamed('/detail-task', arguments: task); 
       },
     );
   }

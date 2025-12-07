@@ -62,9 +62,17 @@ class HomeView extends GetView<HomeController> {
               
               // Menggunakan Obx agar update otomatis
               Obx(() {
+                // 1. Cek apakah sedang loading?
+                if (controller.taskController.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                // 2. Cek apakah data kosong?
                 if (controller.todayTasks.isEmpty) {
                   return const Text("No tasks for today", style: TextStyle(color: Colors.grey));
                 }
+
+                // 3. Tampilkan Data
                 return Column(
                   children: controller.todayTasks.map((task) => _buildTaskCard(task)).toList(),
                 );
@@ -156,7 +164,7 @@ class HomeView extends GetView<HomeController> {
       date: task.date,
       dateColor: task.dateColor,
       progressColor: task.progressColor,
-      onTap: () => Get.toNamed('/detail-task'),
+      onTap: () => Get.toNamed('/detail-task', arguments: task),
     );
   }
 }

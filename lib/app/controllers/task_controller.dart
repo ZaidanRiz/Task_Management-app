@@ -1,61 +1,65 @@
-import 'package:flutter/material.dart';
+//import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../data/models/task_model.dart';
+import '../data/services/task_service.dart'; // Import Service
 
 class TaskController extends GetxController {
-  // 1. List Global untuk menyimpan SEMUA tugas
+  // Panggil Service
+  final TaskService _taskService = TaskService();
+
+  // State
   var tasks = <TaskModel>[].obs;
+  var isLoading = false.obs; // Untuk indikator loading
 
   @override
   void onInit() {
     super.onInit();
-    // 2. Isi data awal (Dummy Data) agar tidak kosong saat pertama buka
-    tasks.addAll([
-      TaskModel(
-        title: 'Design new ui presentation',
-        project: 'RI Task',
-        progress: 10,
-        total: 10,
-        date: '7 Nov 2025',
-        dateColor: Colors.red,
-        progressColor: Colors.green,
-      ),
-      TaskModel(
-        title: 'Add more ui/ux to mockups',
-        project: 'PKPL Task',
-        progress: 7,
-        total: 10,
-        date: '19 Nov 2025',
-        dateColor: const Color(0xFFF7941D),
-        progressColor: Colors.orange,
-      ),
-      TaskModel(
-        title: 'Search Idea of Problems',
-        project: 'RI Task',
-        progress: 3,
-        total: 10,
-        date: '1 Des 2025',
-        dateColor: const Color(0xFF6C63FF),
-        progressColor: Colors.blue,
-      ),
-    ]);
+    // Panggil data saat aplikasi dibuka
+    loadTasks();
   }
 
-  // 3. Fungsi Menambah Tugas Baru
-  void addTask(TaskModel task) {
+  // 1. READ (Ambil data dari Dummy API)
+  void loadTasks() async {
+    try {
+      isLoading.value = true; // Mulai Loading
+      
+      // Ambil data dari service (menunggu 2 detik sesuai dummy)
+      var fetchedTasks = await _taskService.fetchTasks();
+      
+      tasks.assignAll(fetchedTasks); // Masukkan ke list
+    } finally {
+      isLoading.value = false; // Selesai Loading
+    }
+  }
+
+  // 2. CREATE (Tambah Data)
+  void addTask(TaskModel task) async {
+    // Simulasi kirim ke server
+    await _taskService.addTask(task);
+    
+    // Update UI Lokal
     tasks.add(task);
-    update(); // Memastikan semua UI yang menyimak ikut update
+    tasks.refresh();
   }
 
-  // 4. Helper: Ambil Tugas Hari Ini (Logic Sederhana berdasarkan string tanggal)
-  // Catatan: Idealnya menggunakan DateTime, tapi kita pakai String dulu sesuai kode Anda
-  List<TaskModel> get todayTasks {
-    // Filter dummy: anggap tugas "19 Nov 2025" adalah hari ini
-    return tasks.where((task) => task.date.contains('19 Nov')).toList();
+  // ... (Fungsi deleteTask dan toggleTodo biarkan tetap lokal untuk performa)
+  void deleteTask(String id) {
+    tasks.removeWhere((task) => task.id == id);
+    tasks.refresh();
   }
 
-  // 5. Helper: Ambil Tugas Mendatang
-  List<TaskModel> get upcomingTasks {
-    return tasks.where((task) => !task.date.contains('19 Nov')).toList();
+  void toggleTodo(String taskId, int index) {
+    var taskIndex = tasks.indexWhere((t) => t.id == taskId);
+    if (taskIndex != -1) {
+      var task = tasks[taskIndex];
+      task.todos[index]['isCompleted'] = !task.todos[index]['isCompleted'];
+      tasks[taskIndex] = task; 
+      tasks.refresh();
+    }
   }
+
+  // Helper Getters
+  // (Logic sederhana: filter string tanggal)
+  List<TaskModel> get todayTasks => tasks.where((e) => e.date.contains('Nov')).toList(); 
+  List<TaskModel> get upcomingTasks => tasks.where((e) => e.date.contains('Des')).toList();
 }

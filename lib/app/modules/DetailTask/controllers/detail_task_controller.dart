@@ -1,34 +1,27 @@
 import 'package:get/get.dart';
+import 'package:task_management_app/app/controllers/task_controller.dart';
+import 'package:task_management_app/app/data/models/task_model.dart';
 
 class DetailTaskController extends GetxController {
-  // Data dummy untuk langkah-langkah (Nanti bisa diambil dari API/Arguments)
-  // Menggunakan RxList agar UI otomatis update saat dicentang
-  var steps = <Map<String, dynamic>>[
-    {'title': '#1 Search References', 'isCompleted': false},
-    {'title': '#2 Search Components', 'isCompleted': false},
-    {'title': '#3 Create Wireframe', 'isCompleted': false},
-    {'title': '#4 Define Color Palette & Typography', 'isCompleted': false},
-    {'title': '#5 Design Key Screens', 'isCompleted': false},
-    {'title': '#6 Add Interaction / Prototype in Figma', 'isCompleted': false},
-    {'title': '#7 Review & Feedback', 'isCompleted': false},
-    {'title': '#8 Revise & Improve Based on Feedback', 'isCompleted': false},
-    {'title': '#9 Finalize UI Kit', 'isCompleted': false},
-    {'title': '#10 Export & Prepare Presentation Deck', 'isCompleted': false},
-  ].obs;
+  // Ambil Global Controller
+  final TaskController globalTaskController = Get.find<TaskController>();
+  
+  // Task yang sedang dilihat
+  late TaskModel task;
 
-  // Fungsi untuk mengubah status checklist
+  @override
+  void onInit() {
+    super.onInit();
+    // Ambil data yang dikirim dari halaman sebelumnya
+    task = Get.arguments as TaskModel;
+  }
+
+  // Fungsi Toggle (Langsung update ke Global)
   void toggleStep(int index) {
-    var step = steps[index];
-    step['isCompleted'] = !step['isCompleted'];
-    steps[index] = step; // Trigger update UI
+    globalTaskController.toggleTodo(task.id, index);
   }
 
-  // Fungsi Edit (Dummy)
-  void editTask() {
-    Get.snackbar("Edit", "Fitur Edit diklik");
-  }
-
-  // Fungsi Delete (Dummy)
+  // Fungsi Delete
   void deleteTask() {
     Get.defaultDialog(
       title: "Delete Task",
@@ -36,10 +29,15 @@ class DetailTaskController extends GetxController {
       textConfirm: "Yes",
       textCancel: "No",
       onConfirm: () {
-        Get.back(); // Tutup dialog
+        globalTaskController.deleteTask(task.id); // Hapus dari global
+        Get.back(); // Tutup Dialog
         Get.back(); // Kembali ke halaman sebelumnya
         Get.snackbar("Deleted", "Task deleted successfully");
       },
     );
+  }
+
+  void editTask() {
+    Get.snackbar("Info", "Fitur Edit akan datang di minggu depan");
   }
 }

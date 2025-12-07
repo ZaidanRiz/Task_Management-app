@@ -55,7 +55,7 @@ class CalendarView extends GetView<CalendarController> {
                   date: task.date,
                   dateColor: task.dateColor,
                   progressColor: task.progressColor,
-                  onTap: () => Get.toNamed('/detail-task'),
+                  onTap: () => Get.toNamed('/detail-task', arguments: task),
                 );
               },
             )),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_management_app/app/controllers/task_controller.dart'; // Import Controller Global
-import 'package:task_management_app/app/data/models/task_model.dart';      // Import Model Task
+import 'package:task_management_app/app/data/models/task_model.dart'; // Import Model Task
 
 class CreateTaskController extends GetxController {
   // 1. Menemukan (Find) Controller Global untuk menyimpan data nanti
@@ -11,12 +11,13 @@ class CreateTaskController extends GetxController {
   final titleController = TextEditingController();
   final dateController = TextEditingController();
   final stepController = TextEditingController();
-  
+
   // Data Label Hari
   final List<String> daysLabel = ['M', 'S', 'S', 'R', 'K', 'J', 'S'];
-  
+
   // State Hari yang dipilih (RxList agar reaktif update UI)
-  var selectedDays = <bool>[false, false, false, false, false, false, false].obs;
+  var selectedDays =
+      <bool>[false, false, false, false, false, false, false].obs;
 
   // Fungsi untuk mengubah status hari (Centang/Uncentang)
   void toggleDay(int index) {
@@ -26,7 +27,9 @@ class CreateTaskController extends GetxController {
   // Fungsi Submit (Simpan Data)
   void submitTask() {
     // 1. UPDATE VALIDASI: Cek Title ATAU Step ATAU Date
-    if (titleController.text.isEmpty || stepController.text.isEmpty || dateController.text.isEmpty) {
+    if (titleController.text.isEmpty ||
+        stepController.text.isEmpty ||
+        dateController.text.isEmpty) {
       Get.snackbar(
         "Gagal",
         "Nama Tugas, Sub Tugas, dan Deadline Tanggal tidak boleh kosong", // <-- Pesan disesuaikan
@@ -40,14 +43,18 @@ class CreateTaskController extends GetxController {
     }
 
     final newTask = TaskModel(
+      id: DateTime.now().toString(), // Generate ID unik
       title: titleController.text,
-      project: "Personal", 
-      progress: 0,        
-      total: 10,          
-      // Karena sudah divalidasi tidak kosong, kita bisa pakai text langsung
-      date: dateController.text, 
-      dateColor: Colors.blue,      
-      progressColor: Colors.blue,  
+      project: "Personal",
+      date: dateController.text.isEmpty ? "Today" : dateController.text,
+      dateColor: Colors.blue,
+      progressColor: Colors.blue,
+      // Masukkan sub-task dari input user
+      todos: [
+        {'title': stepController.text, 'isCompleted': false},
+        // Bisa tambah default steps lain jika mau
+        {'title': 'Review Task', 'isCompleted': false},
+      ],
     );
 
     globalTaskController.addTask(newTask);

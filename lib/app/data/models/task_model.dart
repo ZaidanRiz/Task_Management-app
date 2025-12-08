@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 
 class TaskModel {
-  String id; // Tambah ID agar mudah dihapus/diedit
+  String id;
   String title;
   String project;
   String date;
   Color dateColor;
   Color progressColor;
-  List<Map<String, dynamic>> todos; // Menyimpan langkah-langkah
-
-  
-
+  List<Map<String, dynamic>> todos;
 
   TaskModel({
     required this.id,
@@ -19,10 +16,11 @@ class TaskModel {
     required this.date,
     required this.dateColor,
     required this.progressColor,
-    this.todos = const [], // Default kosong
+    required this.todos,
   });
 
-  // Getter dinamis untuk menghitung progress & total
   int get total => todos.length;
-  int get progress => todos.where((e) => e['isCompleted'] == true).length;
+
+  int get progress =>
+      todos.where((t) => t['isCompleted'] == true).length;
 }

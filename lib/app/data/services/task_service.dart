@@ -1,23 +1,22 @@
-// Path: lib/app/data/services/task_service.dart
-
-import 'dart:async';
+// lib/app/data/services/task_service.dart
+import 'package:task_management_app/app/data/models/task_model.dart';
 import 'package:flutter/material.dart';
-import '../models/task_model.dart';
 
 class TaskService {
-  // Simulasikan tanggal tugas di masa depan (misal tahun 2025)
-  final List<TaskModel> _dummyDatabase = [
+  // Simpel in-memory storage; ganti dengan API / local DB sesuai kebutuhan
+  final List<TaskModel> _store = [
+    // contoh data (opsional)
     TaskModel(
       id: '1',
       title: 'Design new ui presentation',
       project: 'RI Task',
-      date: '7 Nov 2025', // Harus konsisten dengan parsing 'd MMM yyyy'
+      date: '7 Nov 2025',
       dateColor: Colors.red,
       progressColor: Colors.green,
       todos: [
-        {'title': 'Search References', 'isCompleted': true},
-        {'title': 'Create Wireframe', 'isCompleted': false},
-        {'title': 'Finalize Design', 'isCompleted': false},
+        {'title': 'Draft', 'isCompleted': true},
+        {'title': 'Review', 'isCompleted': false},
+        {'title': 'Finalize', 'isCompleted': false},
       ],
     ),
     TaskModel(
@@ -25,34 +24,35 @@ class TaskService {
       title: 'Add more ui/ux to mockups',
       project: 'PKPL Task',
       date: '19 Nov 2025',
-      dateColor: const Color(0xFFF7941D),
+      dateColor: Colors.orange,
       progressColor: Colors.orange,
       todos: [
-        {'title': 'Sketching', 'isCompleted': true},
-        {'title': 'Prototyping', 'isCompleted': true},
-      ],
-    ),
-    // Tugas Tambahan (misal di bulan Desember 2025)
-    TaskModel(
-      id: '3',
-      title: 'Final Project Submission',
-      project: 'University',
-      date: '10 Dec 2025',
-      dateColor: Colors.purple,
-      progressColor: Colors.blue,
-      todos: [
-        {'title': 'Write report', 'isCompleted': false},
+        {'title': 'Mockup 1', 'isCompleted': true},
+        {'title': 'Mockup 2', 'isCompleted': true},
       ],
     ),
   ];
 
   Future<List<TaskModel>> fetchTasks() async {
-    await Future.delayed(const Duration(seconds: 2));
-    return _dummyDatabase;
+    // Simulasi delay seperti network / DB
+    await Future.delayed(const Duration(milliseconds: 300));
+    return List<TaskModel>.from(_store);
   }
 
-  Future<bool> addTask(TaskModel task) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return true;
+  Future<void> addTask(TaskModel task) async {
+    await Future.delayed(const Duration(milliseconds: 150));
+    _store.add(task);
+  }
+
+  Future<void> deleteTask(String id) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    _store.removeWhere((t) => t.id == id);
+  }
+
+  // update toggle todo
+  Future<void> updateTask(TaskModel task) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    var idx = _store.indexWhere((t) => t.id == task.id);
+    if (idx != -1) _store[idx] = task;
   }
 }

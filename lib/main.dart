@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: '/description', // Sesuai routeName yang Anda pakai
-          page: () => const AllTasksView(),
+          page: () => AllTasksView(),
           binding: AllTaskBinding(), // Inject binding di sini
         ),
         GetPage(name: '/settings', page: () => const SettingsView()),

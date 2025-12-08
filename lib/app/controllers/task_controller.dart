@@ -1,65 +1,82 @@
-//import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../data/models/task_model.dart';
-import '../data/services/task_service.dart'; // Import Service
+import '../data/services/task_service.dart';
 
 class TaskController extends GetxController {
-  // Panggil Service
   final TaskService _taskService = TaskService();
 
-  // State
   var tasks = <TaskModel>[].obs;
-  var isLoading = false.obs; // Untuk indikator loading
+  var isLoading = false.obs;
+
+  var todayTasks = <TaskModel>[].obs;
+  var upcomingTasks = <TaskModel>[].obs;
 
   @override
   void onInit() {
     super.onInit();
-    // Panggil data saat aplikasi dibuka
     loadTasks();
   }
 
-  // 1. READ (Ambil data dari Dummy API)
   void loadTasks() async {
     try {
-      isLoading.value = true; // Mulai Loading
-      
-      // Ambil data dari service (menunggu 2 detik sesuai dummy)
+      isLoading.value = true;
       var fetchedTasks = await _taskService.fetchTasks();
-      
-      tasks.assignAll(fetchedTasks); // Masukkan ke list
+      tasks.assignAll(fetchedTasks);
+
+      assignTaskCategories();
     } finally {
-      isLoading.value = false; // Selesai Loading
+      isLoading.value = false;
     }
   }
 
-  // 2. CREATE (Tambah Data)
-  void addTask(TaskModel task) async {
-    // Simulasi kirim ke server
-    await _taskService.addTask(task);
-    
-    // Update UI Lokal
-    tasks.add(task);
-    tasks.refresh();
+  // FIXED: KATEGORI TODAY & UPCOMING
+  void assignTaskCategories() {
+    todayTasks.clear();
+    upcomingTasks.clear();
+
+    DateTime now = DateTime.now();
+    DateTime todayDate = DateTime(now.year, now.month, now.day);
+
+    for (var task in tasks) {
+      try {
+        DateTime taskDate = DateFormat("dd/MM/yyyy").parse(task.date);
+        DateTime only = DateTime(taskDate.year, taskDate.month, taskDate.day);
+
+        if (only.isAtSameMomentAs(todayDate)) {
+          todayTasks.add(task);
+        } else if (only.isAfter(todayDate)) {
+          upcomingTasks.add(task);
+        }
+      } catch (e) {
+        print("ERROR PARSE: ${task.date}");
+      }
+    }
+
+    todayTasks.refresh();
+    upcomingTasks.refresh();
   }
 
-  // ... (Fungsi deleteTask dan toggleTodo biarkan tetap lokal untuk performa)
+  // CREATE
+  void addTask(TaskModel task) async {
+    await _taskService.addTask(task);
+    tasks.add(task);
+    assignTaskCategories();
+  }
+
   void deleteTask(String id) {
     tasks.removeWhere((task) => task.id == id);
-    tasks.refresh();
+    assignTaskCategories();
   }
 
   void toggleTodo(String taskId, int index) {
-    var taskIndex = tasks.indexWhere((t) => t.id == taskId);
-    if (taskIndex != -1) {
-      var task = tasks[taskIndex];
+    int i = tasks.indexWhere((t) => t.id == taskId);
+    if (i != -1) {
+      var task = tasks[i];
       task.todos[index]['isCompleted'] = !task.todos[index]['isCompleted'];
-      tasks[taskIndex] = task; 
+      tasks[i] = task;
       tasks.refresh();
+      assignTaskCategories();
     }
   }
-
-  // Helper Getters
-  // (Logic sederhana: filter string tanggal)
-  List<TaskModel> get todayTasks => tasks.where((e) => e.date.contains('Nov')).toList(); 
-  List<TaskModel> get upcomingTasks => tasks.where((e) => e.date.contains('Des')).toList();
 }

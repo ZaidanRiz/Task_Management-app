@@ -3,12 +3,16 @@ import 'package:task_management_app/app/controllers/task_controller.dart';
 import 'package:task_management_app/app/data/models/task_model.dart';
 
 class AllTaskController extends GetxController {
-  // 1. Menemukan (Find) Controller Global yang menyimpan data pusat
+  // 1. Temukan Controller Global
   final TaskController taskController = Get.find<TaskController>();
 
-  // 2. Getter untuk mengambil data 'todayTasks' dari Global Controller
-  List<TaskModel> get todayTasks => taskController.todayTasks;
+  // 2. Gunakan RxList (Wajib untuk Obx)
+  // Kita nge-bridge (menjembatani) data dari Global ke View ini
+  RxList<TaskModel> get todayTasks => taskController.todayTasks;
+  RxList<TaskModel> get upcomingTasks => taskController.upcomingTasks;
 
-  // 3. Getter untuk mengambil data 'upcomingTasks' dari Global Controller
-  List<TaskModel> get upcomingTasks => taskController.upcomingTasks;
+  // 3. Fungsi Refresh (Memanggil logika di Global)
+  void refreshTasks() {
+    taskController.assignTaskCategories();
+  }
 }

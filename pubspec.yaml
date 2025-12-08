@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   get: ^4.7.2
   image_picker: ^1.0.7  # Untuk ambil foto
-  intl: ^0.19.0         # Untuk format tanggal
+  intl: ^0.20.2         # Untuk format tanggal
 
 dev_dependencies:
   flutter_test:

@@ -1,35 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../controllers/create_task_controller.dart';
 
-class CreateTaskView extends GetView<CreateTaskController> {
+class CreateTaskView extends StatefulWidget {
   const CreateTaskView({super.key});
 
-  Future<void> _selectDate(BuildContext context, CreateTaskController controller) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: controller.selectedDateTime.value, 
-      firstDate: DateTime.now(), 
-      lastDate: DateTime(2101),
-      builder: (context, child) {
-        return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.blue, 
-              onPrimary: Colors.white,
-              onSurface: Colors.black, 
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
-          child: child!,
-        );
-      },
-    );
+  @override
+  State<CreateTaskView> createState() => _CreateTaskViewState();
+}
 
-    if (picked != null) {
-      controller.setSelectedDate(picked); 
-    }
-  }
+class _CreateTaskViewState extends State<CreateTaskView> {
+  // 1. Data Label Hari
+  final List<String> days = ['M', 'S', 'S', 'R', 'K', 'J', 'S'];
+  
+  // 2. Status Pilihan (Default: semua false/belum dipilih)
+  List<bool> selectedDays = [false, false, false, false, false, false, false];
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +23,7 @@ class CreateTaskView extends GetView<CreateTaskController> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Add Task',
@@ -57,50 +40,32 @@ class CreateTaskView extends GetView<CreateTaskController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTextField(
-              hint: 'Masukkan Nama Misi', 
-              controller: controller.titleController
-            ),
-            
+            _buildTextField(hint: 'Masukkan Nama Misi'),
             const SizedBox(height: 20),
             const Text('Steps', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 10),
-            
-            _buildTextField(hint: 'Masukkan Sub Task', controller: controller.stepController),
+            _buildTextField(hint: 'Masukkan Sub Task'),
             const SizedBox(height: 10),
-            _buildTextField(hint: 'Masukkan Sub Task',),
+            _buildTextField(hint: 'Masukkan Sub Task'),
             const SizedBox(height: 10),
-            _buildTextField(hint: 'Masukkan Sub Task',),
-            
+            _buildTextField(hint: 'Masukkan Sub Task'),
             const SizedBox(height: 20),
             const Text('Date', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 10),
-            
-            Obx(() {
-                var _ = controller.selectedDateTime.value; 
-                return _buildTextField(
-                    hint: 'Pilih Tanggal Deadline (Contoh: 16 Oct)', 
-                    suffixIcon: Icons.calendar_today, 
-                    isRedIcon: true,
-                    controller: controller.dateController,
-                    onTap: () => _selectDate(context, controller), 
-                    readOnly: true,
-                );
-            }),
-            
+            _buildTextField(hint: 'Masukkan Tanggal Deadline (DD/MM/YY)', suffixIcon: Icons.calendar_today, isRedIcon: true),
             const SizedBox(height: 20),
             const Text('Reminder', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 10),
             
+            // 3. Panggil Widget Reminder Box yang sudah diupdate
             _buildReminderBox(),
             
             const SizedBox(height: 30),
-            
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => Get.back(),
+                    onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent.shade100,
                       foregroundColor: Colors.red,
@@ -111,33 +76,28 @@ class CreateTaskView extends GetView<CreateTaskController> {
                   ),
                 ),
                 const SizedBox(width: 20),
-                
-                // --- TOMBOL CONTINUE DENGAN LOADING STATE ---
-                Obx(() => Expanded(
+                Expanded(
                   child: ElevatedButton(
-                    // Tombol dinonaktifkan jika sedang loading
-                    onPressed: controller.isLoading.isTrue 
-                      ? null 
-                      : () => controller.submitTask(),
+                    onPressed: () {
+                      // Tampilkan Notifikasi Berhasil
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Berhasil menambahkan task!'),
+                          backgroundColor: Colors.green,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      Navigator.pop(context);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: controller.isLoading.isTrue
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
-                        : const Text('Continue'),
+                    child: const Text('Continue'),
                   ),
-                )),
-                // --- END TOMBOL LOADING ---
+                ),
               ],
             ),
           ],
@@ -146,19 +106,8 @@ class CreateTaskView extends GetView<CreateTaskController> {
     );
   }
 
-  // Widget _buildTextField
-  Widget _buildTextField({
-    required String hint, 
-    IconData? suffixIcon, 
-    bool isRedIcon = false,
-    TextEditingController? controller,
-    VoidCallback? onTap, 
-    bool readOnly = false,
-  }) {
+  Widget _buildTextField({required String hint, IconData? suffixIcon, bool isRedIcon = false}) {
     return TextField(
-      controller: controller,
-      readOnly: readOnly,
-      onTap: onTap,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
@@ -170,7 +119,7 @@ class CreateTaskView extends GetView<CreateTaskController> {
     );
   }
 
-  // Widget _buildReminderBox
+  // 4. Widget Reminder Box yang sudah Interaktif
   Widget _buildReminderBox() {
     return Container(
       padding: const EdgeInsets.all(15),
@@ -181,44 +130,46 @@ class CreateTaskView extends GetView<CreateTaskController> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Berikan Notifikasi Setiap:', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-                const SizedBox(height: 10),
-                
-                Obx(() => Wrap( 
-                  spacing: 8,
-                  children: List.generate(controller.daysLabel.length, (index) {
-                    bool isSelected = controller.selectedDays[index];
-            
-                    return GestureDetector(
-                      onTap: () => controller.toggleDay(index),
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.blue : Colors.transparent,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          controller.daysLabel[index],
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.grey,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Berikan Notifikasi Setiap:', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+              const SizedBox(height: 10),
+              
+              // Generate tombol hari berdasarkan list
+              Row(
+                children: List.generate(days.length, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      // Logic: Ubah status terpilih true <-> false
+                      setState(() {
+                        selectedDays[index] = !selectedDays[index];
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      width: 30, // Lebar area sentuh
+                      height: 30, // Tinggi area sentuh
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        // Jika dipilih warna Biru, jika tidak transparan
+                        color: selectedDays[index] ? Colors.blue : Colors.transparent,
+                        shape: BoxShape.circle, // Bentuk bulat
+                      ),
+                      child: Text(
+                        days[index],
+                        style: TextStyle(
+                          // Jika dipilih text Putih, jika tidak Abu-abu
+                          color: selectedDays[index] ? Colors.white : Colors.grey,
+                          fontWeight: selectedDays[index] ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
-                    );
-                  }),
-                )),
-              ],
-            ),
+                    ),
+                  );
+                }),
+              ),
+            ],
           ),
-          
-          const SizedBox(width: 10),
           const Icon(Icons.notifications_active_outlined, color: Colors.orange, size: 30),
         ],
       ),

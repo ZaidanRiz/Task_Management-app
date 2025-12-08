@@ -88,7 +88,9 @@ class CreateTaskController extends GetxController {
 
     isLoading.value = false;
     // Navigasi ke All Tasks View
-    Get.offNamed('/description'); 
+    globalTaskController.assignTaskCategories();
+    Get.offNamed('/description');
+
   }
 
   @override

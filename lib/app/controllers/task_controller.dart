@@ -40,7 +40,8 @@ class TaskController extends GetxController {
 
     for (var task in tasks) {
       try {
-        DateTime taskDate = DateFormat("dd/MM/yyyy").parse(task.date);
+        // Dukung beberapa format input tanggal (contoh: "07/12/2025" atau "7 Dec 2025")
+        DateTime taskDate = _parseTaskDate(task.date);
         DateTime only = DateTime(taskDate.year, taskDate.month, taskDate.day);
 
         if (only.isAtSameMomentAs(todayDate)) {
@@ -49,12 +50,38 @@ class TaskController extends GetxController {
           upcomingTasks.add(task);
         }
       } catch (e) {
-        print("ERROR PARSE: ${task.date}");
+        print("ERROR PARSE: ${task.date} -> $e");
       }
     }
 
     todayTasks.refresh();
     upcomingTasks.refresh();
+  }
+
+  // Coba beberapa format tanggal yang umum agar tidak gagal mengelompokkan tanpa terlihat
+  DateTime _parseTaskDate(String raw) {
+    final candidates = <DateFormat>[
+      DateFormat("dd/MM/yyyy"), // contoh: 07/12/2025
+      DateFormat("d/M/yyyy"), // contoh: 7/12/2025
+      DateFormat("dd MMM yyyy"), // contoh: 07 Dec 2025
+      DateFormat("d MMM yyyy"), // contoh: 7 Dec 2025
+      DateFormat("d MMMM yyyy"), // contoh: 7 December 2025
+    ];
+
+    for (final fmt in candidates) {
+      try {
+        return fmt.parseStrict(raw);
+      } catch (_) {
+        // lanjut ke format berikutnya
+      }
+    }
+    // Jika semua format gagal, coba DateTime.parse (format mirip ISO)
+    try {
+      return DateTime.parse(raw);
+    } catch (_) {
+      // Lempar ulang dengan konteks agar bisa ditangani pemanggil
+      throw FormatException('Unsupported date format: $raw');
+    }
   }
 
   // CREATE
@@ -65,8 +92,11 @@ class TaskController extends GetxController {
   }
 
   void deleteTask(String id) {
-    tasks.removeWhere((task) => task.id == id);
-    assignTaskCategories();
+    // Jaga konsistensi data di service, lalu perbarui list reaktif lokal
+    _taskService.deleteTask(id).then((_) {
+      tasks.removeWhere((task) => task.id == id);
+      assignTaskCategories();
+    });
   }
 
   void toggleTodo(String taskId, int index) {

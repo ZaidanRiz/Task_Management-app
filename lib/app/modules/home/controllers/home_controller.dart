@@ -6,9 +6,9 @@ class HomeController extends GetxController {
   // 1. Ambil Controller Global
   final TaskController taskController = Get.find<TaskController>();
 
-  // 2. Getter untuk Today Tasks (Otomatis update karena Rx)
-  List<TaskModel> get todayTasks => taskController.todayTasks;
+  // 2. Getter untuk Today Tasks (kembalikan RxList agar Obx berlangganan perubahan)
+  RxList<TaskModel> get todayTasks => taskController.todayTasks;
 
   // 3. Getter untuk Upcoming Tasks
-  List<TaskModel> get upcomingTasks => taskController.upcomingTasks;
+  RxList<TaskModel> get upcomingTasks => taskController.upcomingTasks;
 }

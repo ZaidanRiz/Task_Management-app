@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart'; 
-import 'package:task_management_app/app/controllers/task_controller.dart'; 
-import 'package:task_management_app/app/data/models/task_model.dart'; 
+import 'package:intl/intl.dart';
+import 'package:task_management_app/app/controllers/task_controller.dart';
+import 'package:task_management_app/app/data/models/task_model.dart';
 
 class CreateTaskController extends GetxController {
   final TaskController globalTaskController = Get.find<TaskController>();
 
   final titleController = TextEditingController();
   final dateController = TextEditingController();
-  final stepController = TextEditingController();
+  // Daftar dinamis field sub task
+  final RxList<TextEditingController> stepControllers =
+      <TextEditingController>[].obs;
 
   var isLoading = false.obs;
-  var selectedDateTime = DateTime.now().obs; 
+  var selectedDateTime = DateTime.now().obs;
 
   final List<String> daysLabel = ['M', 'S', 'S', 'R', 'K', 'J', 'S'];
 
@@ -23,23 +25,48 @@ class CreateTaskController extends GetxController {
     selectedDays[index] = !selectedDays[index];
   }
 
+  @override
+  void onInit() {
+    super.onInit();
+    // Pastikan minimal ada 1 field sub task
+    stepControllers.add(TextEditingController());
+  }
+
   // --- PERBAIKAN DATE FORMAT: Tambahkan TAHUN (yyyy) ---
   void setSelectedDate(DateTime pickedDate) {
     selectedDateTime.value = pickedDate;
-    
+
     // Format yang konsisten dengan CalendarController: 'd MMM yyyy'
-    final formattedDate = DateFormat('d MMM yyyy').format(pickedDate); 
-    dateController.text = formattedDate; 
+    final formattedDate = DateFormat('d MMM yyyy').format(pickedDate);
+    dateController.text = formattedDate;
   }
   // --- END PERBAIKAN DATE FORMAT ---
 
+  // Kelola field sub task dinamis
+  void addStepField() {
+    stepControllers.add(TextEditingController());
+  }
+
+  void removeStepField(int index) {
+    if (stepControllers.length <= 1) return; // jaga minimal 1
+    final ctrl = stepControllers.removeAt(index);
+    ctrl.dispose();
+  }
+
   void submitTask() async {
-    if (titleController.text.isEmpty ||
-        stepController.text.isEmpty ||
-        dateController.text.isEmpty) {
+    // Bangun todos dari field langkah yang tidak kosong
+    final List<Map<String, dynamic>> newTodos = stepControllers
+        .map((c) => c.text.trim())
+        .where((t) => t.isNotEmpty)
+        .map((t) => {'title': t, 'isCompleted': false})
+        .toList();
+
+    if (titleController.text.trim().isEmpty ||
+        dateController.text.trim().isEmpty ||
+        newTodos.isEmpty) {
       Get.snackbar(
         "Gagal",
-        "Nama Tugas, Sub Tugas, dan Deadline Tanggal tidak boleh kosong",
+        "Nama Tugas, minimal 1 Sub Task, dan Tanggal tidak boleh kosong",
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP,
@@ -48,26 +75,17 @@ class CreateTaskController extends GetxController {
       );
       return;
     }
-    
-    isLoading.value = true; // START LOADING
 
-    // 1. Buat list Todos
-    final List<Map<String, dynamic>> newTodos = [
-        {'title': stepController.text, 'isCompleted': false},
-        {'title': 'Review Task', 'isCompleted': false},
-    ];
+    isLoading.value = true; // Mulai loading
 
     // 2. Buat TaskModel (Mengembalikan progress/total yang hilang)
     final newTask = TaskModel(
-      id: DateTime.now().toString(), 
+      id: DateTime.now().toString(),
       title: titleController.text,
-      project: "Personal", 
+      project: "Personal",
       date: dateController.text, // Sekarang termasuk Tahun
       dateColor: Colors.blue,
       progressColor: Colors.blue,
-      
-     
-      
       todos: newTodos,
     );
 
@@ -84,20 +102,21 @@ class CreateTaskController extends GetxController {
     );
 
     // 3. Transisi Asinkron (Menghilangkan kesan 'stuck')
-    await Future.delayed(const Duration(milliseconds: 1200)); 
+    await Future.delayed(const Duration(milliseconds: 1200));
 
     isLoading.value = false;
     // Navigasi ke All Tasks View
     globalTaskController.assignTaskCategories();
     Get.offNamed('/description');
-
   }
 
   @override
   void onClose() {
     titleController.dispose();
     dateController.dispose();
-    stepController.dispose();
+    for (final c in stepControllers) {
+      c.dispose();
+    }
     super.onClose();
   }
 }

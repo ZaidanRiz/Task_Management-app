@@ -2,9 +2,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../data/models/task_model.dart';
 import '../data/services/task_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'auth_controller.dart';
+import 'dart:async';
 
 class TaskController extends GetxController {
   final TaskService _taskService = TaskService();
+  final AuthController _auth = Get.find<AuthController>();
 
   var tasks = <TaskModel>[].obs;
   var isLoading = false.obs;
@@ -12,16 +16,49 @@ class TaskController extends GetxController {
   var todayTasks = <TaskModel>[].obs;
   var upcomingTasks = <TaskModel>[].obs;
 
+  String? _currentUid;
+  StreamSubscription<List<TaskModel>>? _tasksSub;
+
   @override
   void onInit() {
     super.onInit();
-    loadTasks();
+    // Dengarkan perubahan user agar daftar tugas berganti sesuai akun aktif
+    _auth.currentUser.listen((user) {
+      _currentUid = user?.uid;
+      if (_currentUid == null) {
+        // Tidak ada user: bersihkan daftar agar tidak nyangkut ke akun sebelumnya
+        _tasksSub?.cancel();
+        tasks.clear();
+        todayTasks.clear();
+        upcomingTasks.clear();
+        tasks.refresh();
+        todayTasks.refresh();
+        upcomingTasks.refresh();
+      } else {
+        _subscribeTasks();
+      }
+    });
+    // Inisialisasi awal jika sudah ada user
+    _currentUid = FirebaseAuth.instance.currentUser?.uid;
+    if (_currentUid != null) {
+      _subscribeTasks();
+    }
+  }
+
+  void _subscribeTasks() {
+    if (_currentUid == null) return;
+    _tasksSub?.cancel();
+    _tasksSub = _taskService.streamTasks(_currentUid!).listen((list) {
+      tasks.assignAll(list);
+      assignTaskCategories();
+    });
   }
 
   void loadTasks() async {
+    if (_currentUid == null) return;
     try {
       isLoading.value = true;
-      var fetchedTasks = await _taskService.fetchTasks();
+      var fetchedTasks = await _taskService.fetchTasks(_currentUid!);
       tasks.assignAll(fetchedTasks);
 
       assignTaskCategories();
@@ -86,14 +123,16 @@ class TaskController extends GetxController {
 
   // CREATE
   void addTask(TaskModel task) async {
-    await _taskService.addTask(task);
+    if (_currentUid == null) return; // Tidak ada user aktif
+    await _taskService.addTask(_currentUid!, task);
     tasks.add(task);
     assignTaskCategories();
   }
 
   void deleteTask(String id) {
+    if (_currentUid == null) return;
     // Jaga konsistensi data di service, lalu perbarui list reaktif lokal
-    _taskService.deleteTask(id).then((_) {
+    _taskService.deleteTask(_currentUid!, id).then((_) {
       tasks.removeWhere((task) => task.id == id);
       assignTaskCategories();
     });
@@ -107,6 +146,10 @@ class TaskController extends GetxController {
       tasks[i] = task;
       tasks.refresh();
       assignTaskCategories();
+      if (_currentUid != null) {
+        // sinkronkan ke service
+        _taskService.updateTask(_currentUid!, task);
+      }
     }
   }
 }

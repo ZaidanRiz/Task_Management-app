@@ -38,11 +38,13 @@ class EditProfileView extends GetView<EditProfileController> {
                       radius: 60,
                       backgroundColor: Colors.grey.shade200,
                       backgroundImage: controller.profileImage.value != null
-                          ? FileImage(controller.profileImage.value!) as ImageProvider
-                          : const AssetImage('assets/images/profile.png'), // Ganti dengan aset default Anda jika ada
-                      // Jika belum punya aset default, pakai Icon:
+                          ? FileImage(controller.profileImage.value!)
+                              as ImageProvider
+                          : null,
+                      // Jika belum ada gambar, tampilkan ikon default saja
                       child: controller.profileImage.value == null
-                          ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                          ? const Icon(Icons.person,
+                              size: 60, color: Colors.grey)
                           : null,
                     );
                   }),
@@ -60,14 +62,15 @@ class EditProfileView extends GetView<EditProfileController> {
                           color: Colors.blue,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                        child: const Icon(Icons.camera_alt,
+                            color: Colors.white, size: 20),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 40),
 
             // --- INPUT NAMA ---
@@ -83,7 +86,8 @@ class EditProfileView extends GetView<EditProfileController> {
             // Menggunakan ReadOnly true agar tidak muncul keyboard, tapi muncul date picker
             GestureDetector(
               onTap: () => controller.selectDate(context),
-              child: AbsorbPointer( // Mencegah keyboard muncul
+              child: AbsorbPointer(
+                // Mencegah keyboard muncul
                 child: _buildTextField(
                   label: "Date of Birth",
                   controller: controller.dateController,
@@ -108,7 +112,10 @@ class EditProfileView extends GetView<EditProfileController> {
                 ),
                 child: const Text(
                   "Save Changes",
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -127,14 +134,17 @@ class EditProfileView extends GetView<EditProfileController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
+        Text(label,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.black54)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.blue),
             hintText: "Enter $label",
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -165,7 +175,8 @@ class EditProfileView extends GetView<EditProfileController> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Change Profile Picture", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text("Change Profile Picture",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -195,7 +206,10 @@ class EditProfileView extends GetView<EditProfileController> {
     );
   }
 
-  Widget _buildOptionItem({required IconData icon, required String label, required VoidCallback onTap}) {
+  Widget _buildOptionItem(
+      {required IconData icon,
+      required String label,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Column(

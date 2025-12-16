@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:task_management_app/app/controllers/task_controller.dart';
+import 'package:task_management_app/app/controllers/auth_controller.dart';
+import 'package:task_management_app/app/controllers/profile_controller.dart';
 import 'package:task_management_app/app/modules/CreateTask/views/create_task_view.dart';
 import 'package:task_management_app/app/modules/CreateTask/bindings/create_task_binding.dart';
 import 'package:task_management_app/app/modules/Settings/views/settings_view.dart';
@@ -23,8 +26,15 @@ import 'package:task_management_app/app/modules/AiAssistant/views/ai_assistant_v
 import 'package:task_management_app/app/modules/EditProfile/bindings/edit_profile_binding.dart';
 import 'package:task_management_app/app/modules/EditProfile/views/edit_profile_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // Inisialisasi controller SETELAH Firebase siap
+  Get.put(AuthController());
   Get.put(TaskController());
+  Get.put(ProfileController());
   runApp(const MyApp());
 }
 

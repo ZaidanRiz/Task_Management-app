@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:task_management_app/app/controllers/auth_controller.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -11,14 +12,14 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
+
   // Variable untuk mengatur status sembunyi/lihat password
   bool _isObscure = true;
 
   // LOGIKA LOGIN DENGAN GETX & DELAY
   void _handleLogin() async {
-    if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
-      
+    if (_emailController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty) {
       // 1. Tampilkan Notifikasi SUKSES
       Get.snackbar(
         "Login Berhasil",
@@ -36,8 +37,7 @@ class _LoginViewState extends State<LoginView> {
       await Future.delayed(const Duration(milliseconds: 1500));
 
       // 3. Pindah ke Home & Hapus History (agar user tidak bisa back ke login)
-      Get.offNamed('/home'); 
-
+      Get.offNamed('/home');
     } else {
       // Notifikasi ERROR
       Get.snackbar(
@@ -67,7 +67,8 @@ class _LoginViewState extends State<LoginView> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -82,7 +83,6 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                
                 const SizedBox(height: 30),
 
                 // 2. TEXT LOGIN BIRU
@@ -91,7 +91,7 @@ class _LoginViewState extends State<LoginView> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue, 
+                    color: Colors.blue,
                   ),
                 ),
 
@@ -104,18 +104,20 @@ class _LoginViewState extends State<LoginView> {
                     SizedBox(width: 8),
                     Text(
                       "Your email",
-                      style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          color: Colors.black54, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                
+
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     hintText: "Enter your email",
                     hintStyle: TextStyle(color: Colors.grey.shade400),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -139,7 +141,8 @@ class _LoginViewState extends State<LoginView> {
                     SizedBox(width: 8),
                     Text(
                       "Password",
-                      style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                          color: Colors.black54, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -151,7 +154,8 @@ class _LoginViewState extends State<LoginView> {
                   decoration: InputDecoration(
                     hintText: "Enter your password",
                     hintStyle: TextStyle(color: Colors.grey.shade400),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 20),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -176,22 +180,22 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                 ),
-                
+
                 // Forgot Password
                 const SizedBox(height: 10),
                 Center(
                   child: TextButton(
                     onPressed: () {
-                      // Menggunakan GetX Navigation
                       Get.toNamed('/forgot-password');
                     },
                     child: const Text(
                       "Forgot Password?",
-                      style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          color: Colors.blue, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(height: 20),
 
                 // 5. BUTTON LOGIN
@@ -199,7 +203,7 @@ class _LoginViewState extends State<LoginView> {
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: _handleLogin, // Memanggil fungsi async di atas
+                    onPressed: _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       elevation: 0,
@@ -210,16 +214,60 @@ class _LoginViewState extends State<LoginView> {
                     child: const Text(
                       "Login",
                       style: TextStyle(
-                        color: Colors.white, 
-                        fontSize: 18, 
-                        fontWeight: FontWeight.bold
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
 
+                const SizedBox(height: 12),
+                // --- LOGIN DENGAN GOOGLE (tepat di bawah tombol Login) ---
+                Obx(() {
+                  final signing = Get.find<AuthController>().isSigningIn.value;
+                  return SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: OutlinedButton.icon(
+                      onPressed: signing
+                          ? null
+                          : () async {
+                              final auth = Get.find<AuthController>();
+                              final res = await auth.signInWithGoogle(
+                                  forceNewAccount: true);
+                              if (res != null) Get.offNamed('/home');
+                            },
+                      icon: signing
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Image.asset(
+                              'assets/images/Google.png',
+                              width: 22,
+                              height: 22,
+                              errorBuilder: (context, error, stack) =>
+                                  const Icon(Icons.g_mobiledata,
+                                      color: Colors.blue),
+                            ),
+                      label: Text(
+                        signing ? 'Memproses...' : 'Masuk dengan Google',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.blue),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+
                 const SizedBox(height: 20),
-                
+
                 // Sign Up Text
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -227,12 +275,12 @@ class _LoginViewState extends State<LoginView> {
                     const Text("Don't have an account? "),
                     GestureDetector(
                       onTap: () {
-                        // Menggunakan GetX Navigation
                         Get.toNamed('/signup');
                       },
                       child: const Text(
                         "Sign up",
-                        style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.blue, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../controllers/profile_controller.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -27,7 +28,7 @@ class SettingsView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
@@ -36,13 +37,16 @@ class SettingsView extends StatelessWidget {
             children: [
               // --- 1. HEADER PROFIL (BISA DIKLIK) ---
               _buildProfileHeader(),
-              
+
               const SizedBox(height: 30),
 
               // --- 2. SECTION CUSTOMIZE ---
               const Text(
                 'Customize',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87),
               ),
               const SizedBox(height: 15),
 
@@ -52,7 +56,7 @@ class SettingsView extends StatelessWidget {
                 title: 'Notifications',
                 onTap: () {
                   Get.snackbar(
-                    "Notifications", 
+                    "Notifications",
                     "Notification settings clicked",
                     snackPosition: SnackPosition.TOP,
                     backgroundColor: Colors.blue.withOpacity(0.1),
@@ -60,7 +64,7 @@ class SettingsView extends StatelessWidget {
                   );
                 },
               ),
-              
+
               const SizedBox(height: 15),
 
               // Opsi Logout
@@ -71,8 +75,8 @@ class SettingsView extends StatelessWidget {
                   _handleLogout();
                 },
               ),
-              
-              const SizedBox(height: 100), 
+
+              const SizedBox(height: 100),
             ],
           ),
         ),
@@ -81,7 +85,7 @@ class SettingsView extends StatelessWidget {
       // --- 3. FLOATING ACTION BUTTON (+) ---
       floatingActionButton: _buildFAB(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      
+
       // --- 4. BOTTOM NAVIGATION BAR ---
       bottomNavigationBar: _buildBottomNavBar(context),
     );
@@ -105,14 +109,16 @@ class SettingsView extends StatelessWidget {
       radius: 15,
       onConfirm: () {
         // Hapus semua rute dan kembali ke login
-        Get.offAllNamed('/login'); 
+        Get.offAllNamed('/login');
       },
     );
   }
 
   // Widget Header Profil (UPDATED: Bisa Diklik)
   Widget _buildProfileHeader() {
-    return GestureDetector( // 1. Bungkus dengan GestureDetector
+    final profile = Get.find<ProfileController>();
+    return GestureDetector(
+      // 1. Bungkus dengan GestureDetector
       onTap: () {
         // 2. Navigasi ke halaman Edit Profile
         Get.toNamed('/edit-profile');
@@ -123,7 +129,10 @@ class SettingsView extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
+            BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 5)),
           ],
         ),
         child: Row(
@@ -132,15 +141,20 @@ class SettingsView extends StatelessWidget {
             const SizedBox(width: 15),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Zaidan Rizqullah', // Nama Dummy
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '24, November 2025', 
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+              children: [
+                Obx(() => Text(
+                      profile.name.value.isNotEmpty
+                          ? profile.name.value
+                          : 'User',
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    )),
+                Obx(() => Text(
+                      profile.birthDate.value.isNotEmpty
+                          ? profile.birthDate.value
+                          : '24-11-2025',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    )),
               ],
             ),
             const Spacer(),
@@ -167,7 +181,10 @@ class SettingsView extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
+            BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 5)),
           ],
         ),
         child: Row(
@@ -211,18 +228,24 @@ class SettingsView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             _buildNavItem(Icons.home, isSelected: false, routeName: homeRoute),
-            _buildNavItem(Icons.calendar_month, isSelected: false, routeName: calendarRoute), // Note: calendar_month or calendar_today depending on your pref
-            const SizedBox(width: 40), 
-            _buildNavItem(Icons.description, isSelected: false, routeName: descriptionRoute),
-            _buildNavItem(Icons.settings, isSelected: true, routeName: settingsRoute), // Aktif
+            _buildNavItem(Icons.calendar_month,
+                isSelected: false,
+                routeName:
+                    calendarRoute), // Note: calendar_month or calendar_today depending on your pref
+            const SizedBox(width: 40),
+            _buildNavItem(Icons.description,
+                isSelected: false, routeName: descriptionRoute),
+            _buildNavItem(Icons.settings,
+                isSelected: true, routeName: settingsRoute), // Aktif
           ],
         ),
       ),
     );
   }
-  
+
   // Widget Item Navigasi Bottom Bar
-  Widget _buildNavItem(IconData icon, {bool isSelected = false, String? routeName}) {
+  Widget _buildNavItem(IconData icon,
+      {bool isSelected = false, String? routeName}) {
     return IconButton(
       icon: Icon(
         icon,

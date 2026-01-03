@@ -13,7 +13,7 @@ class AllTasksView extends GetView<AllTaskController> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back(closeOverlays: false),
         ),
         title: const Text(
           'All Tasks',
@@ -46,7 +46,8 @@ class AllTasksView extends GetView<AllTaskController> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Center(
-                      child: Text("Tidak ada tugas hari ini.", style: TextStyle(color: Colors.grey)),
+                      child: Text("Tidak ada tugas hari ini.",
+                          style: TextStyle(color: Colors.grey)),
                     ),
                   );
                 }
@@ -65,7 +66,7 @@ class AllTasksView extends GetView<AllTaskController> {
               // --- LIST UPCOMING ---
               Obx(() {
                 if (controller.upcomingTasks.isEmpty) {
-                   return Container(
+                  return Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -73,7 +74,8 @@ class AllTasksView extends GetView<AllTaskController> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Center(
-                      child: Text("Tidak ada tugas mendatang.", style: TextStyle(color: Colors.grey)),
+                      child: Text("Tidak ada tugas mendatang.",
+                          style: TextStyle(color: Colors.grey)),
                     ),
                   );
                 }
@@ -103,7 +105,7 @@ class AllTasksView extends GetView<AllTaskController> {
       onPressed: () async {
         // 1. Tunggu user kembali dari halaman create
         await Get.toNamed('/create-task');
-        
+
         // 2. Refresh data saat kembali
         controller.refreshTasks();
       },
@@ -150,17 +152,21 @@ class AllTasksView extends GetView<AllTaskController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             _buildNavItem(Icons.home, isSelected: false, routeName: '/home'),
-            _buildNavItem(Icons.calendar_month, isSelected: false, routeName: '/calendar'),
+            _buildNavItem(Icons.calendar_month,
+                isSelected: false, routeName: '/calendar'),
             const SizedBox(width: 40), // Space untuk FAB di tengah
-            _buildNavItem(Icons.description, isSelected: true, routeName: '/description'),
-            _buildNavItem(Icons.settings, isSelected: false, routeName: '/settings'),
+            _buildNavItem(Icons.description,
+                isSelected: true, routeName: '/description'),
+            _buildNavItem(Icons.settings,
+                isSelected: false, routeName: '/settings'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, {bool isSelected = false, String? routeName}) {
+  Widget _buildNavItem(IconData icon,
+      {bool isSelected = false, String? routeName}) {
     return IconButton(
       icon: Icon(
         icon,

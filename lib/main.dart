@@ -38,8 +38,27 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensure GetX snackbar controller is initialized to avoid late init errors
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        Get.snackbar('', '',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.transparent,
+            duration: const Duration(milliseconds: 1));
+      } catch (_) {}
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

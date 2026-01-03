@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Tambahkan ini
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,9 +9,10 @@ import '../../firebase_options.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance; // Instance Firestore
+  final FirebaseFirestore _firestore =
+      FirebaseFirestore.instance; // Instance Firestore
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  
+
   final Rx<User?> currentUser = Rx<User?>(null);
   final isSigningIn = false.obs;
 
@@ -42,25 +44,51 @@ class AuthController extends GetxController {
   Future<User?> signUp(String name, String email, String password) async {
     try {
       isSigningIn.value = true;
-      
-      // 1. Buat user di Auth
-      UserCredential res = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
 
-      // 2. Simpan data tambahan ke Firestore
+      // 1. Buat user di Auth (tambahkan timeout untuk menghindari hang)
+      UserCredential res = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .timeout(const Duration(seconds: 20));
+
+      // 2. Simpan data tambahan ke Firestore (dengan timeout)
       if (res.user != null) {
-        await _firestore.collection('User').doc(res.user!.uid).set({
-          'uid': res.user!.uid,
-          'name': name,
-          'email': email,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        try {
+          await _firestore.collection('users').doc(res.user!.uid).set({
+            'uid': res.user!.uid,
+            'name': name,
+            'email': email.trim().toLowerCase(),
+            'photoUrl': '',
+            'role': 'user',
+            'createdAt': FieldValue.serverTimestamp(),
+          }).timeout(const Duration(seconds: 10));
+
+          // Also set the FirebaseAuth displayName so local ProfileController sees it
+          try {
+            await res.user!.updateDisplayName(name);
+            await res.user!.reload();
+            // currentUser stream will emit updated user
+          } catch (_) {
+            // non-fatal if displayName update fails
+          }
+        } catch (e) {
+          // Jika penulisan ke Firestore gagal (mis. permission-denied), hapus user Auth
+          try {
+            if (res.user != null) await res.user!.delete();
+          } catch (_) {}
+          rethrow;
+        }
       }
       return res.user;
     } on FirebaseAuthException catch (e) {
       Get.snackbar('Sign Up Gagal', e.message ?? 'Terjadi kesalahan',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return null;
+    } on TimeoutException catch (_) {
+      Get.snackbar('Sign Up Gagal', 'Permintaan timeout. Periksa koneksi Anda.',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return null;
+    } catch (e) {
+      Get.snackbar('Sign Up Gagal', e.toString(),
           backgroundColor: Colors.red, colorText: Colors.white);
       return null;
     } finally {
@@ -69,11 +97,14 @@ class AuthController extends GetxController {
   }
 
   // --- FUNGSI GOOGLE SIGN IN ---
-  Future<UserCredential?> signInWithGoogle({bool forceNewAccount = false}) async {
+  Future<UserCredential?> signInWithGoogle(
+      {bool forceNewAccount = false}) async {
     try {
       isSigningIn.value = true;
       if (forceNewAccount) {
-        try { await _googleSignIn.disconnect(); } catch (_) {}
+        try {
+          await _googleSignIn.disconnect();
+        } catch (_) {}
         await _googleSignIn.signOut();
       }
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -81,7 +112,8 @@ class AuthController extends GetxController {
         isSigningIn.value = false;
         return null;
       }
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -96,7 +128,9 @@ class AuthController extends GetxController {
   }
 
   Future<void> signOut() async {
-    try { await _googleSignIn.disconnect(); } catch (_) {}
+    try {
+      await _googleSignIn.disconnect();
+    } catch (_) {}
     await _googleSignIn.signOut();
     await _auth.signOut();
   }

@@ -15,11 +15,12 @@ class DetailTaskView extends GetView<DetailTaskController> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back(closeOverlays: false),
         ),
         title: Text(
           controller.task.project, // Judul Project Dinamis (misal: 'RI Task')
-          style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
@@ -34,23 +35,23 @@ class DetailTaskView extends GetView<DetailTaskController> {
           const SizedBox(width: 10),
         ],
       ),
-      
+
       body: SafeArea(
         child: Column(
           children: [
             // --- HEADER JUDUL TUGAS ---
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 // Judul Tugas Dinamis (misal: 'Design new ui...')
                 child: Text(
-                  controller.task.title, 
+                  controller.task.title,
                   style: const TextStyle(
-                    fontSize: 20, 
-                    fontWeight: FontWeight.bold, 
-                    color: Colors.black87
-                  ),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87),
                 ),
               ),
             ),
@@ -60,19 +61,18 @@ class DetailTaskView extends GetView<DetailTaskController> {
               child: Obx(() {
                 // Mencari data tugas terbaru dari Global Controller agar reaktif
                 // (Jika user mencentang, UI langsung berubah)
-                var currentTask = controller.globalTaskController.tasks.firstWhere(
-                  (element) => element.id == controller.task.id, 
-                  orElse: () => controller.task
-                );
+                var currentTask = controller.globalTaskController.tasks
+                    .firstWhere((element) => element.id == controller.task.id,
+                        orElse: () => controller.task);
 
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   // Menggunakan 'todos' dari TaskModel
-                  itemCount: currentTask.todos.length, 
+                  itemCount: currentTask.todos.length,
                   itemBuilder: (context, index) {
                     final step = currentTask.todos[index];
                     return _buildStepItem(
-                      title: step['title'], 
+                      title: step['title'],
                       isCompleted: step['isCompleted'],
                       onTap: () => controller.toggleStep(index),
                     );
@@ -87,8 +87,8 @@ class DetailTaskView extends GetView<DetailTaskController> {
       // --- BOTTOM NAVIGATION BAR ---
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-           // Tambah logika add step jika diperlukan nanti
-        }, 
+          // Tambah logika add step jika diperlukan nanti
+        },
         backgroundColor: Colors.blue,
         elevation: 4.0,
         shape: const CircleBorder(),
@@ -100,7 +100,10 @@ class DetailTaskView extends GetView<DetailTaskController> {
   }
 
   // Widget Item Checklist Custom (Kotak Biru)
-  Widget _buildStepItem({required String title, required bool isCompleted, required VoidCallback onTap}) {
+  Widget _buildStepItem(
+      {required String title,
+      required bool isCompleted,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -110,9 +113,8 @@ class DetailTaskView extends GetView<DetailTaskController> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: Colors.blue.withOpacity(0.5), // Warna Border Biru
-            width: 1.5
-          ),
+              color: Colors.blue.withOpacity(0.5), // Warna Border Biru
+              width: 1.5),
         ),
         child: Row(
           children: [
@@ -126,9 +128,9 @@ class DetailTaskView extends GetView<DetailTaskController> {
                 border: Border.all(color: Colors.blue, width: 1.5),
                 color: isCompleted ? Colors.blue : Colors.transparent,
               ),
-              child: isCompleted 
-                ? const Icon(Icons.check, size: 16, color: Colors.white) 
-                : null,
+              child: isCompleted
+                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                  : null,
             ),
             const SizedBox(width: 15),
             // Teks Langkah
@@ -139,7 +141,9 @@ class DetailTaskView extends GetView<DetailTaskController> {
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
-                  decoration: isCompleted ? TextDecoration.lineThrough : null, // Coret jika selesai
+                  decoration: isCompleted
+                      ? TextDecoration.lineThrough
+                      : null, // Coret jika selesai
                 ),
               ),
             ),
@@ -162,17 +166,20 @@ class DetailTaskView extends GetView<DetailTaskController> {
           children: <Widget>[
             // Home
             _buildNavItem(Icons.home, isSelected: false, routeName: '/home'),
-            
+
             // Calendar
-            _buildNavItem(Icons.calendar_month, isSelected: false, routeName: '/calendar'),
-            
+            _buildNavItem(Icons.calendar_month,
+                isSelected: false, routeName: '/calendar'),
+
             const SizedBox(width: 40), // Spasi untuk FAB (+)
-            
+
             // All Tasks (Description)
-            _buildNavItem(Icons.description, isSelected: false, routeName: '/description'),
-            
+            _buildNavItem(Icons.description,
+                isSelected: false, routeName: '/description'),
+
             // Settings
-            _buildNavItem(Icons.settings, isSelected: false, routeName: '/settings'),
+            _buildNavItem(Icons.settings,
+                isSelected: false, routeName: '/settings'),
           ],
         ),
       ),
@@ -180,7 +187,8 @@ class DetailTaskView extends GetView<DetailTaskController> {
   }
 
   // Widget Helper Item Navigasi
-  Widget _buildNavItem(IconData icon, {bool isSelected = false, String? routeName}) {
+  Widget _buildNavItem(IconData icon,
+      {bool isSelected = false, String? routeName}) {
     return IconButton(
       icon: Icon(
         icon,
@@ -189,7 +197,7 @@ class DetailTaskView extends GetView<DetailTaskController> {
       ),
       onPressed: () {
         if (routeName != null) {
-          // Menggunakan Get.offNamed agar halaman Detail ditutup 
+          // Menggunakan Get.offNamed agar halaman Detail ditutup
           Get.offNamed(routeName);
         }
       },

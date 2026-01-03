@@ -15,7 +15,6 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
   // LOGIKA RESET PASSWORD
   void _handleResetPassword() async {
     if (_emailController.text.isNotEmpty) {
-      
       // 1. Tampilkan Notifikasi SUKSES
       Get.snackbar(
         "Email Terkirim",
@@ -33,8 +32,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
       await Future.delayed(const Duration(milliseconds: 2000));
 
       // 3. Kembali ke halaman Login otomatis
-      Get.back(); 
-
+      Get.back(closeOverlays: false);
     } else {
       // Notifikasi ERROR jika email kosong
       Get.snackbar(
@@ -67,7 +65,7 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
           // Menggunakan GetX untuk kembali
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back(closeOverlays: false),
         ),
       ),
       body: SafeArea(
@@ -77,20 +75,20 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              
+
               // --- JUDUL HALAMAN ---
               const Text(
-                "Forgot your password?", 
+                "Forgot your password?",
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
-              
+
               // --- DESKRIPSI ---
               const Text(
                 "A code will be sent to your email to help reset password",
                 style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
-              
+
               const SizedBox(height: 40),
 
               // --- INPUT EMAIL ---
@@ -100,7 +98,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                   SizedBox(width: 8),
                   Text(
                     "Email Address",
-                    style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                        color: Colors.black54, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -110,8 +109,10 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                 decoration: InputDecoration(
                   hintText: "Enter your email",
                   hintStyle: TextStyle(color: Colors.grey.shade400),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20)),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(color: Colors.grey.shade300),
@@ -139,7 +140,10 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                   ),
                   child: const Text(
                     "Reset Password",
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -150,10 +154,11 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
               Center(
                 child: TextButton(
                   // Menggunakan GetX untuk kembali
-                  onPressed: () => Get.back(),
+                  onPressed: () => Get.back(closeOverlays: false),
                   child: const Text(
-                    "Back to login", 
-                    style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
+                    "Back to login",
+                    style: TextStyle(
+                        color: Colors.grey, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),

@@ -7,9 +7,9 @@ class TaskCard extends StatelessWidget {
   final String date;
   final double progress;
   final String progressText;
-  
+
   // Opsional: Tambahkan callback jika ingin custom navigasi dari luar
-  final VoidCallback? onTap; 
+  final VoidCallback? onTap;
 
   const TaskCard({
     super.key,
@@ -25,19 +25,20 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // 2. Bungkus dengan InkWell/GestureDetector untuk interaksi
     return GestureDetector(
-      onTap: onTap ?? () {
-        // Default Action jika tidak ada onTap khusus:
-        // Misalnya masuk ke detail task
-        // Get.toNamed('/task-detail', arguments: {'title': title});
-        
-        Get.snackbar(
-          "Task Clicked", 
-          "You clicked on $title",
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(10),
-          duration: const Duration(seconds: 1),
-        );
-      },
+      onTap: onTap ??
+          () {
+            // Default Action jika tidak ada onTap khusus:
+            // Misalnya masuk ke detail task
+            // Get.toNamed('/task-detail', arguments: {'title': title});
+
+            Get.snackbar(
+              "Task Clicked",
+              "You clicked on $title",
+              snackPosition: SnackPosition.BOTTOM,
+              margin: const EdgeInsets.all(10),
+              duration: const Duration(seconds: 1),
+            );
+          },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -55,9 +56,11 @@ class TaskCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: Text(title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
-                
+
                 // 3. Tombol Opsi dengan Get.bottomSheet
                 IconButton(
                   icon: const Icon(Icons.more_horiz, color: Colors.grey),
@@ -78,7 +81,8 @@ class TaskCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 const Text("Progress", style: TextStyle(color: Colors.grey)),
                 const Spacer(),
-                Text(progressText, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(progressText,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
             const SizedBox(height: 8),
@@ -98,7 +102,10 @@ class TaskCard extends StatelessWidget {
               ),
               child: Text(
                 date,
-                style: TextStyle(color: Colors.yellow.shade900, fontSize: 12, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Colors.yellow.shade900,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -120,16 +127,17 @@ class TaskCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40, 
-              height: 4, 
-              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10))
-            ),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10))),
             const SizedBox(height: 20),
             ListTile(
               leading: const Icon(Icons.edit, color: Colors.blue),
               title: const Text("Edit Task"),
               onTap: () {
-                Get.back(); // Tutup bottom sheet
+                Get.back(closeOverlays: false); // Tutup bottom sheet
                 Get.toNamed('/create-task'); // Contoh navigasi ke edit
               },
             ),
@@ -137,20 +145,20 @@ class TaskCard extends StatelessWidget {
               leading: const Icon(Icons.delete, color: Colors.red),
               title: const Text("Delete Task"),
               onTap: () {
-                Get.back(); // Tutup bottom sheet
+                Get.back(closeOverlays: false); // Tutup bottom sheet
                 // Tampilkan Dialog Konfirmasi Hapus
                 Get.defaultDialog(
-                  title: "Delete Task",
-                  middleText: "Are you sure you want to delete '$title'?",
-                  textCancel: "Cancel",
-                  textConfirm: "Delete",
-                  confirmTextColor: Colors.white,
-                  buttonColor: Colors.red,
-                  onConfirm: () {
-                    Get.back(); // Tutup dialog
-                    Get.snackbar("Deleted", "Task has been deleted", backgroundColor: Colors.red.withOpacity(0.2));
-                  }
-                );
+                    title: "Delete Task",
+                    middleText: "Are you sure you want to delete '$title'?",
+                    textCancel: "Cancel",
+                    textConfirm: "Delete",
+                    confirmTextColor: Colors.white,
+                    buttonColor: Colors.red,
+                    onConfirm: () {
+                      Get.back(closeOverlays: false); // Tutup dialog
+                      Get.snackbar("Deleted", "Task has been deleted",
+                          backgroundColor: Colors.red.withOpacity(0.2));
+                    });
               },
             ),
           ],

@@ -32,14 +32,13 @@ class SignUpController extends GetxController {
         password: password.trim(),
       );
 
-      // 2. Gunakan Map atau Model untuk simpan ke Firestore
-      // Modifikasi: Nama koleksi sebaiknya lowercase 'users' (konvensi umum)
-      await _firestore.collection('User').doc(res.user!.uid).set({
+      // 2. Simpan data user ke koleksi 'users'
+      await _firestore.collection('users').doc(res.user!.uid).set({
         'uid': res.user!.uid,
         'username': name,
         'email': email.trim().toLowerCase(),
-        'photoUrl': '', // Tambahkan field kosong untuk foto profil nanti
-        'role': 'user', // Tambahkan role jika diperlukan
+        'photoUrl': '',
+        'role': 'user',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -48,8 +47,7 @@ class SignUpController extends GetxController {
           backgroundColor: Colors.green, colorText: Colors.white);
 
       await Future.delayed(const Duration(seconds: 1));
-      Get.offAllNamed('/login');
-
+      Get.offAllNamed('/home');
     } on FirebaseAuthException catch (e) {
       String message = "Terjadi kesalahan";
       if (e.code == 'email-already-in-use') {

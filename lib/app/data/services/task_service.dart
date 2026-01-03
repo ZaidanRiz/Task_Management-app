@@ -31,14 +31,19 @@ class TaskService {
         .toList();
   }
 
-  Future<void> addTask(String uid, TaskModel task) async {
-    final data = task.toMap();
-    data['createdAt'] = FieldValue.serverTimestamp();
-    if (task.id.isNotEmpty) {
-      await _col(uid).doc(task.id).set(data, SetOptions(merge: true));
-    } else {
-      await _col(uid).add(data);
-      // Jika TaskController mengandalkan id lokal, biarkan Firestore yang menentukan id
+  Future<String> addTask(String uid, TaskModel task) async {
+    try {
+      final data = task.toMap();
+      data['createdAt'] = FieldValue.serverTimestamp();
+      if (task.id.isNotEmpty) {
+        await _col(uid).doc(task.id).set(data, SetOptions(merge: true));
+        return task.id;
+      } else {
+        final docRef = await _col(uid).add(data);
+        return docRef.id;
+      }
+    } on FirebaseException catch (e) {
+      throw Exception('Firestore error (${e.code}): ${e.message}');
     }
   }
 

@@ -21,7 +21,7 @@ class EditProfileView extends GetView<EditProfileController> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: SingleChildScrollView(
@@ -54,7 +54,7 @@ class EditProfileView extends GetView<EditProfileController> {
                     right: 0,
                     child: GestureDetector(
                       onTap: () {
-                        _showImagePickerOptions();
+                        _showImagePickerOptions(context);
                       },
                       child: Container(
                         padding: const EdgeInsets.all(8),
@@ -164,7 +164,7 @@ class EditProfileView extends GetView<EditProfileController> {
   }
 
   // --- BOTTOM SHEET PILIH GALERI / KAMERA ---
-  void _showImagePickerOptions() {
+  void _showImagePickerOptions(BuildContext context) {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(20),
@@ -185,7 +185,7 @@ class EditProfileView extends GetView<EditProfileController> {
                   icon: Icons.camera_alt,
                   label: "Camera",
                   onTap: () {
-                    Get.back();
+                    Navigator.of(context).pop();
                     controller.pickImage(ImageSource.camera);
                   },
                 ),
@@ -193,7 +193,7 @@ class EditProfileView extends GetView<EditProfileController> {
                   icon: Icons.image,
                   label: "Gallery",
                   onTap: () {
-                    Get.back();
+                    Navigator.of(context).pop();
                     controller.pickImage(ImageSource.gallery);
                   },
                 ),

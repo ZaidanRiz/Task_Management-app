@@ -122,9 +122,12 @@ class TaskController extends GetxController {
   }
 
   // CREATE
-  void addTask(TaskModel task) async {
+  Future<void> addTask(TaskModel task) async {
     if (_currentUid == null) return; // Tidak ada user aktif
-    await _taskService.addTask(_currentUid!, task);
+    final id = await _taskService.addTask(_currentUid!, task);
+    if (task.id != id) {
+      task.id = id;
+    }
     tasks.add(task);
     assignTaskCategories();
   }

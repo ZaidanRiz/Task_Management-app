@@ -5,7 +5,7 @@ import 'package:task_management_app/app/data/models/task_model.dart';
 class DetailTaskController extends GetxController {
   // Ambil Global Controller
   final TaskController globalTaskController = Get.find<TaskController>();
-  
+
   // Task yang sedang dilihat
   late TaskModel task;
 
@@ -30,8 +30,8 @@ class DetailTaskController extends GetxController {
       textCancel: "No",
       onConfirm: () {
         globalTaskController.deleteTask(task.id); // Hapus dari global
-        Get.back(); // Tutup Dialog
-        Get.back(); // Kembali ke halaman sebelumnya
+        Get.back(closeOverlays: false); // Tutup Dialog
+        Get.back(closeOverlays: false); // Kembali ke halaman sebelumnya
         Get.snackbar("Deleted", "Task deleted successfully");
       },
     );

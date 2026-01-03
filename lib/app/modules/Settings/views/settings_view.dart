@@ -18,7 +18,7 @@ class SettingsView extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           // GetX: Kembali ke halaman sebelumnya
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back(closeOverlays: false),
         ),
         title: const Text(
           'Settings',

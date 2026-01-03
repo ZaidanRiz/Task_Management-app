@@ -88,26 +88,38 @@ class CreateTaskController extends GetxController {
       progressColor: Colors.blue,
       todos: newTodos,
     );
+    try {
+      await globalTaskController.addTask(newTask);
 
-    globalTaskController.addTask(newTask);
+      Get.snackbar(
+        "Berhasil",
+        "Task '${titleController.text}' berhasil ditambahkan!",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+        duration: const Duration(seconds: 1),
+      );
 
-    Get.snackbar(
-      "Berhasil",
-      "Task '${titleController.text}' berhasil ditambahkan!",
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.TOP,
-      margin: const EdgeInsets.all(10),
-      duration: const Duration(seconds: 1),
-    );
+      // 3. Transisi Asinkron (Menghilangkan kesan 'stuck')
+      await Future.delayed(const Duration(milliseconds: 1200));
 
-    // 3. Transisi Asinkron (Menghilangkan kesan 'stuck')
-    await Future.delayed(const Duration(milliseconds: 1200));
-
-    isLoading.value = false;
-    // Navigasi ke All Tasks View
-    globalTaskController.assignTaskCategories();
-    Get.offNamed('/description');
+      // Navigasi ke All Tasks View
+      globalTaskController.assignTaskCategories();
+      Get.offNamed('/description');
+    } catch (e) {
+      final msg = e.toString();
+      Get.snackbar(
+        "Gagal",
+        msg,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(10),
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override

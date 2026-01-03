@@ -13,15 +13,16 @@ class AiAssistantView extends GetView<AiAssistantController> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Get.back(closeOverlays: false),
         ),
         title: Row(
           children: const [
-            Icon(Icons.lightbulb, color: Colors.yellow), 
+            Icon(Icons.lightbulb, color: Colors.yellow),
             SizedBox(width: 8),
             Text(
               'AI Assistant',
-              style: TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold),
+              style:
+                  TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -57,7 +58,8 @@ class AiAssistantView extends GetView<AiAssistantController> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: const Text("AI is typing...", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      child: const Text("AI is typing...",
+                          style: TextStyle(color: Colors.grey, fontSize: 12)),
                     ),
                   ),
                 )
@@ -68,7 +70,10 @@ class AiAssistantView extends GetView<AiAssistantController> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: const BoxDecoration(
               color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, offset: Offset(0, -2))],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black12, blurRadius: 5, offset: Offset(0, -2))
+              ],
             ),
             child: Row(
               children: [
@@ -83,9 +88,11 @@ class AiAssistantView extends GetView<AiAssistantController> {
                       ),
                       filled: true,
                       fillColor: Colors.grey.shade100,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
                     ),
-                    onSubmitted: (_) => controller.sendMessage(), // Kirim saat tekan enter
+                    onSubmitted: (_) =>
+                        controller.sendMessage(), // Kirim saat tekan enter
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -112,7 +119,8 @@ class AiAssistantView extends GetView<AiAssistantController> {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 5),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        constraints: const BoxConstraints(maxWidth: 250), // Lebar maksimal bubble
+        constraints:
+            const BoxConstraints(maxWidth: 250), // Lebar maksimal bubble
         decoration: BoxDecoration(
           color: msg.isUser ? Colors.blue : Colors.white,
           borderRadius: BorderRadius.only(
@@ -123,7 +131,10 @@ class AiAssistantView extends GetView<AiAssistantController> {
           ),
           boxShadow: [
             if (!msg.isUser)
-              BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 3, offset: const Offset(0, 2))
+              BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 3,
+                  offset: const Offset(0, 2))
           ],
         ),
         child: Text(

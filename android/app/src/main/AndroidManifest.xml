@@ -2,7 +2,7 @@
     <!-- Izin internet diperlukan untuk Firebase Auth dan Google Sign-In -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="task_management_app"
+        android:label="task management app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

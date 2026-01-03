@@ -13,7 +13,7 @@ class AiAssistantView extends GetView<AiAssistantController> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(closeOverlays: false),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Row(
           children: const [

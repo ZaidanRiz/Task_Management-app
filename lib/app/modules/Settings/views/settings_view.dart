@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../controllers/profile_controller.dart';
 
 class SettingsView extends StatelessWidget {
@@ -17,8 +19,8 @@ class SettingsView extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          // GetX: Kembali ke halaman sebelumnya
-          onPressed: () => Get.back(closeOverlays: false),
+          // Navigator: Kembali ke halaman sebelumnya
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Settings',
@@ -72,7 +74,7 @@ class SettingsView extends StatelessWidget {
                 icon: Icons.logout,
                 title: 'Logout',
                 onTap: () {
-                  _handleLogout();
+                  _handleLogout(context);
                 },
               ),
 
@@ -96,21 +98,28 @@ class SettingsView extends StatelessWidget {
   // ==========================================
 
   // Logika Logout dengan GetX Dialog
-  void _handleLogout() {
-    Get.defaultDialog(
-      title: "Logout",
-      titleStyle: const TextStyle(fontWeight: FontWeight.bold),
-      middleText: "Are you sure you want to logout?",
-      textCancel: "Cancel",
-      textConfirm: "Logout",
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
-      cancelTextColor: Colors.black,
-      radius: 15,
-      onConfirm: () {
-        // Hapus semua rute dan kembali ke login
-        Get.offAllNamed('/login');
-      },
+  void _handleLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title:
+            const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Get.offAllNamed('/login');
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -137,8 +146,40 @@ class SettingsView extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.person_pin, size: 40, color: Colors.black87),
-            const SizedBox(width: 15),
+            // Profile photo (if available) otherwise default icon
+            Builder(builder: (_) {
+              final user = FirebaseAuth.instance.currentUser;
+              ImageProvider? avatarImage;
+              if (user?.photoURL != null && user!.photoURL!.isNotEmpty) {
+                final val = user.photoURL!;
+                if (val.startsWith('data:image')) {
+                  try {
+                    final parts = val.split(',');
+                    final bytes = base64Decode(parts.last);
+                    avatarImage = MemoryImage(bytes);
+                  } catch (e) {
+                    avatarImage = NetworkImage(user.photoURL!);
+                  }
+                } else {
+                  avatarImage = NetworkImage(user.photoURL!);
+                }
+              }
+
+              return Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.grey.shade200,
+                    backgroundImage: avatarImage,
+                    child: avatarImage == null
+                        ? const Icon(Icons.person,
+                            size: 28, color: Colors.black87)
+                        : null,
+                  ),
+                  const SizedBox(width: 15),
+                ],
+              );
+            }),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -158,8 +199,25 @@ class SettingsView extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            // 3. Icon Edit sebagai penanda visual
-            const Icon(Icons.edit, color: Colors.grey),
+            // 3. Tombol Kamera & Icon Edit sebagai penanda visual
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.camera_alt, color: Colors.blue),
+                  onPressed: () {
+                    // langsung ke Edit Profile untuk mengubah foto
+                    Get.toNamed('/edit-profile');
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.grey),
+                  onPressed: () {
+                    Get.toNamed('/edit-profile');
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ),

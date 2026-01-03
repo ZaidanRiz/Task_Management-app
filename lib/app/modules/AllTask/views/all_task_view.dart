@@ -13,7 +13,7 @@ class AllTasksView extends GetView<AllTaskController> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Get.back(closeOverlays: false),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'All Tasks',

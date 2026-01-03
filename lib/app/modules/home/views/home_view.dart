@@ -16,7 +16,7 @@ class HomeView extends GetView<HomeController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-              
+
               // --- SEARCH BAR ---
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -24,32 +24,48 @@ class HomeView extends GetView<HomeController> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
-                    BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))
+                    BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5))
                   ],
                 ),
-                child: const TextField(
+                child: TextField(
+                  onChanged: (value) => controller.updateSearch(value),
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: "Search for Tasks",
-                    icon: Icon(Icons.search),
+                    icon: const Icon(Icons.search),
+                    suffixIcon: controller.searchQuery.value.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              controller.clearSearch();
+                            },
+                          )
+                        : null,
                   ),
                 ),
               ),
               const SizedBox(height: 30),
 
               // --- CATEGORIES ---
-              const Text("Categories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text("Categories",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildCategoryCard(
-                    Icons.checklist, 
-                    "To Do List", 
+                    Icons.checklist,
+                    "To Do List",
                     Colors.blue,
                     onTap: () => Get.toNamed('/description'),
                   ),
-                  _buildCategoryCard(Icons.lightbulb, "AI Assistant", Colors.yellow,
+                  _buildCategoryCard(
+                    Icons.lightbulb,
+                    "AI Assistant",
+                    Colors.yellow,
                     onTap: () => Get.toNamed('/ai-assistant'),
                   ),
                 ],
@@ -57,9 +73,10 @@ class HomeView extends GetView<HomeController> {
               const SizedBox(height: 20),
 
               // --- TODAY'S TASK (DYNAMIS) ---
-              const Text("Today's task", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text("Today's task",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 15),
-              
+
               // Menggunakan Obx agar update otomatis
               Obx(() {
                 // 1. Cek apakah sedang loading?
@@ -69,36 +86,43 @@ class HomeView extends GetView<HomeController> {
 
                 // 2. Cek apakah data kosong?
                 if (controller.todayTasks.isEmpty) {
-                  return const Text("No tasks for today", style: TextStyle(color: Colors.grey));
+                  return const Text("No tasks for today",
+                      style: TextStyle(color: Colors.grey));
                 }
 
                 // 3. Tampilkan Data
                 return Column(
-                  children: controller.todayTasks.map((task) => _buildTaskCard(task)).toList(),
+                  children: controller.todayTasks
+                      .map((task) => _buildTaskCard(task))
+                      .toList(),
                 );
               }),
 
               const SizedBox(height: 20),
 
               // --- UPCOMING TASK (DYNAMIS) ---
-              const Text("Upcoming task", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text("Upcoming task",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 15),
-              
+
               Obx(() {
                 if (controller.upcomingTasks.isEmpty) {
-                  return const Text("No upcoming tasks", style: TextStyle(color: Colors.grey));
+                  return const Text("No upcoming tasks",
+                      style: TextStyle(color: Colors.grey));
                 }
                 return Column(
-                  children: controller.upcomingTasks.map((task) => _buildTaskCard(task)).toList(),
+                  children: controller.upcomingTasks
+                      .map((task) => _buildTaskCard(task))
+                      .toList(),
                 );
               }),
-              
+
               const SizedBox(height: 80),
             ],
           ),
         ),
       ),
-      
+
       // FAB
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.toNamed('/create-task'),
@@ -107,7 +131,7 @@ class HomeView extends GetView<HomeController> {
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      
+
       // BOTTOM NAV BAR
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -118,11 +142,19 @@ class HomeView extends GetView<HomeController> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.home, color: Colors.blue)), // Aktif
-              IconButton(onPressed: () => Get.toNamed('/calendar'), icon: const Icon(Icons.calendar_month, color: Colors.grey)),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.home, color: Colors.blue)), // Aktif
+              IconButton(
+                  onPressed: () => Get.toNamed('/calendar'),
+                  icon: const Icon(Icons.calendar_month, color: Colors.grey)),
               const SizedBox(width: 40),
-              IconButton(onPressed: () => Get.toNamed('/description'), icon: const Icon(Icons.description, color: Colors.grey)),
-              IconButton(onPressed: () => Get.toNamed('/settings'), icon: const Icon(Icons.settings, color: Colors.grey)),
+              IconButton(
+                  onPressed: () => Get.toNamed('/description'),
+                  icon: const Icon(Icons.description, color: Colors.grey)),
+              IconButton(
+                  onPressed: () => Get.toNamed('/settings'),
+                  icon: const Icon(Icons.settings, color: Colors.grey)),
             ],
           ),
         ),
@@ -132,23 +164,32 @@ class HomeView extends GetView<HomeController> {
 
   // --- HELPER WIDGETS ---
 
-  Widget _buildCategoryCard(IconData icon, String title, Color color, {VoidCallback? onTap}) {
+  Widget _buildCategoryCard(IconData icon, String title, Color color,
+      {VoidCallback? onTap}) {
     return GestureDetector(
-      onTap: onTap, 
+      onTap: onTap,
       child: Container(
         width: 100,
         height: 100,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 5, spreadRadius: 1)],
+          boxShadow: [
+            BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                blurRadius: 5,
+                spreadRadius: 1)
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: color, size: 32),
             const SizedBox(height: 8),
-            Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+            Text(title,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
           ],
         ),
       ),
@@ -204,9 +245,13 @@ class TaskCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: dateColor.withOpacity(0.4), width: 1), 
+          border: Border.all(color: dateColor.withOpacity(0.4), width: 1),
           boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.15), spreadRadius: 2, blurRadius: 10, offset: const Offset(0, 5)),
+            BoxShadow(
+                color: Colors.grey.withOpacity(0.15),
+                spreadRadius: 2,
+                blurRadius: 10,
+                offset: const Offset(0, 5)),
           ],
         ),
         child: Column(
@@ -215,18 +260,22 @@ class TaskCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16)),
                 const Icon(Icons.more_horiz, color: Colors.grey),
               ],
             ),
             const SizedBox(height: 5),
-            Text(project, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+            Text(project,
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
             const SizedBox(height: 15),
             Row(
               children: <Widget>[
                 const Icon(Icons.list_alt, size: 14, color: Colors.grey),
                 const SizedBox(width: 5),
-                const Text('Progress', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const Text('Progress',
+                    style: TextStyle(fontSize: 12, color: Colors.grey)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: ClipRRect(
@@ -240,7 +289,9 @@ class TaskCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text('$progress/$total', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                Text('$progress/$total',
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold)),
               ],
             ),
             const SizedBox(height: 15),
@@ -250,7 +301,11 @@ class TaskCard extends StatelessWidget {
                 color: dateColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(date, style: TextStyle(color: dateColor, fontWeight: FontWeight.bold, fontSize: 12)),
+              child: Text(date,
+                  style: TextStyle(
+                      color: dateColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12)),
             ),
           ],
         ),

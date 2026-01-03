@@ -15,7 +15,7 @@ class DetailTaskView extends GetView<DetailTaskController> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.back(closeOverlays: false),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           controller.task.project, // Judul Project Dinamis (misal: 'RI Task')

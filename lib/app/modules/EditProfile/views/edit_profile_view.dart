@@ -1,6 +1,7 @@
 //import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import '../controllers/edit_profile_controller.dart';
 
@@ -34,15 +35,32 @@ class EditProfileView extends GetView<EditProfileController> {
                 children: [
                   // Lingkaran Foto
                   Obx(() {
+                    // Priority: local selected file > saved URL from Firestore > default icon
+                    ImageProvider? imageProvider;
+                    if (controller.profileImageBytes.value != null) {
+                      imageProvider =
+                          MemoryImage(controller.profileImageBytes.value!);
+                    } else if (controller.photoUrl.value.isNotEmpty) {
+                      final val = controller.photoUrl.value;
+                      if (val.startsWith('data:image')) {
+                        try {
+                          final parts = val.split(',');
+                          final bytes = base64Decode(parts.last);
+                          imageProvider = MemoryImage(bytes);
+                        } catch (e) {
+                          // fallback to NetworkImage if decoding fails
+                          imageProvider = NetworkImage(val);
+                        }
+                      } else {
+                        imageProvider = NetworkImage(val);
+                      }
+                    }
+
                     return CircleAvatar(
                       radius: 60,
                       backgroundColor: Colors.grey.shade200,
-                      backgroundImage: controller.profileImage.value != null
-                          ? FileImage(controller.profileImage.value!)
-                              as ImageProvider
-                          : null,
-                      // Jika belum ada gambar, tampilkan ikon default saja
-                      child: controller.profileImage.value == null
+                      backgroundImage: imageProvider,
+                      child: imageProvider == null
                           ? const Icon(Icons.person,
                               size: 60, color: Colors.grey)
                           : null,

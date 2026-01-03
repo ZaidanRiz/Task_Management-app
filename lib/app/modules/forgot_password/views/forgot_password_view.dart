@@ -64,8 +64,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
         // Tombol Back Custom (Panah kecil)
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          // Menggunakan GetX untuk kembali
-          onPressed: () => Get.back(closeOverlays: false),
+          // Navigator: Kembali ke halaman sebelumnya
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: SafeArea(
@@ -153,8 +153,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
               // --- LINK BACK TO LOGIN ---
               Center(
                 child: TextButton(
-                  // Menggunakan GetX untuk kembali
-                  onPressed: () => Get.back(closeOverlays: false),
+                  // Navigator: Kembali ke halaman sebelumnya
+                  onPressed: () => Navigator.of(context).pop(),
                   child: const Text(
                     "Back to login",
                     style: TextStyle(

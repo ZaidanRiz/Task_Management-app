@@ -14,7 +14,7 @@ class CreateTaskView extends GetView<CreateTaskController> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Get.back(closeOverlays: false),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Add Task',
@@ -113,7 +113,7 @@ class CreateTaskView extends GetView<CreateTaskController> {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => Get.back(closeOverlays: false),
+                    onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent.shade100,
                       foregroundColor: Colors.red,

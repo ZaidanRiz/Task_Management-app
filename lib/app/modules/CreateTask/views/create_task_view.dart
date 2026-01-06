@@ -101,6 +101,21 @@ class CreateTaskView extends GetView<CreateTaskController> {
               },
             ),
             const SizedBox(height: 20),
+            const Text('Time',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 10),
+            TextField(
+              controller: controller.timeController,
+              readOnly: true,
+              decoration:
+                  _inputDecoration('Pilih Jam Pengingat (HH:mm)').copyWith(
+                suffixIcon: const Icon(Icons.access_time, color: Colors.orange),
+              ),
+              onTap: () async {
+                await controller.pickTime(context);
+              },
+            ),
+            const SizedBox(height: 20),
             const Text('Reminder',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 10),

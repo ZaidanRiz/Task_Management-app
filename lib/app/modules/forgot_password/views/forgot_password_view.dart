@@ -92,8 +92,8 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
               const SizedBox(height: 40),
 
               // --- INPUT EMAIL ---
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(Icons.email_outlined, size: 18, color: Colors.black54),
                   SizedBox(width: 8),
                   Text(

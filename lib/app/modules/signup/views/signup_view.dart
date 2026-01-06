@@ -110,8 +110,8 @@ class _SignUpViewState extends State<SignUpView> {
                 const SizedBox(height: 30),
 
                 // --- INPUT USERNAME ---
-                Row(
-                  children: const [
+                const Row(
+                  children: [
                     Icon(Icons.person_outline, size: 18, color: Colors.black54),
                     SizedBox(width: 8),
                     Text(
@@ -146,8 +146,8 @@ class _SignUpViewState extends State<SignUpView> {
                 const SizedBox(height: 20),
 
                 // --- INPUT EMAIL ---
-                Row(
-                  children: const [
+                const Row(
+                  children: [
                     Icon(Icons.email_outlined, size: 18, color: Colors.black54),
                     SizedBox(width: 8),
                     Text(
@@ -182,8 +182,8 @@ class _SignUpViewState extends State<SignUpView> {
                 const SizedBox(height: 20),
 
                 // --- INPUT PASSWORD ---
-                Row(
-                  children: const [
+                const Row(
+                  children: [
                     Icon(Icons.lock_outline, size: 18, color: Colors.black54),
                     SizedBox(width: 8),
                     Text(

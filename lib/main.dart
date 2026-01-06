@@ -25,12 +25,15 @@ import 'package:task_management_app/app/modules/AiAssistant/bindings/ai_assistan
 import 'package:task_management_app/app/modules/AiAssistant/views/ai_assistant_view.dart';
 import 'package:task_management_app/app/modules/EditProfile/bindings/edit_profile_binding.dart';
 import 'package:task_management_app/app/modules/EditProfile/views/edit_profile_view.dart';
+import 'package:task_management_app/app/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Initialize local notifications with user's timezone
+  await NotificationService.instance.init();
   // Inisialisasi controller SETELAH Firebase siap
   Get.put(AuthController());
   Get.put(TaskController());
@@ -101,7 +104,7 @@ class _MyAppState extends State<MyApp> {
         ),
         GetPage(
           name: '/description', // Sesuai routeName yang Anda pakai
-          page: () => AllTasksView(),
+          page: () => const AllTasksView(),
           binding: AllTaskBinding(), // Inject binding di sini
         ),
         GetPage(name: '/settings', page: () => const SettingsView()),

@@ -169,14 +169,14 @@ class EditProfileController extends GetxController {
 
             final b64 = base64Encode(jpeg);
             uploadedPhotoUrl = 'data:image/jpeg;base64,$b64';
-            this.photoUrl.value = uploadedPhotoUrl;
+            photoUrl.value = uploadedPhotoUrl;
             print('Photo encoded to base64, length=${b64.length}');
           } catch (e) {
             print('Image processing failed: $e');
             // fallback to raw bytes encode (may fail due to size)
             final b64 = base64Encode(bytes);
             uploadedPhotoUrl = 'data:image/jpeg;base64,$b64';
-            this.photoUrl.value = uploadedPhotoUrl;
+            photoUrl.value = uploadedPhotoUrl;
           }
 
           // Optionally update FirebaseAuth.photoURL (may store data URL)

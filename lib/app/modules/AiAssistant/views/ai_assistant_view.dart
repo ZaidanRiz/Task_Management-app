@@ -15,8 +15,8 @@ class AiAssistantView extends GetView<AiAssistantController> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             Icon(Icons.lightbulb, color: Colors.yellow),
             SizedBox(width: 8),
             Text(

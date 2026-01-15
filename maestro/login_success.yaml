@@ -1,0 +1,23 @@
+appId: com.example.nama_app  # Ganti dengan package name di android/app/build.gradle
+---
+# 1. Pastikan aplikasi dimulai dari kondisi bersih
+- launchApp:
+    clearState: true
+
+# 2. Tunggu hingga layar Login muncul
+- assertVisible: "Welcome Back"
+
+# 3. Alur Input Fungsional
+- tapOn: "Enter your email"
+- inputText: "user@example.com"
+
+- tapOn: "Enter your password"
+- inputText: "password123"
+
+# 4. Eksekusi Login
+- tapOn: "Login"
+
+# 5. Verifikasi Berhasil (Testing Fungsional)
+# Ganti "Beranda" dengan teks unik yang hanya ada di halaman setelah login
+- assertVisible: "Beranda"
+- assertVisible: "Logout"

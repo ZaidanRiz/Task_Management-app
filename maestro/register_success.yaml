@@ -1,0 +1,29 @@
+appId: com.example.task_management_app  # Ganti dengan package name di android/app/build.gradle
+---
+- launchApp:
+    clearState: true
+    
+- tapOn: "Lets Start"
+# 1. Navigasi ke halaman Sign Up (asumsi mulai dari Login)
+- tapOn: "Sign up" 
+
+# 2. Input Data (Fungsional)
+- tapOn: "Create a username"
+- inputText: "UserBaru2024"
+
+- tapOn: "Enter your email"
+- inputText: "userbaru@example.com"
+
+- tapOn: "Create a password"
+- inputText: "Password123"
+
+# 3. Eksekusi
+- tapOn: "Sign Up"
+
+# 4. Verifikasi Snackbar & Navigasi (Non-Fungsional & Fungsional)
+- assertVisible: "Berhasil Mendaftar"
+- assertVisible: "Akun berhasil dibuat. Silakan login."
+
+# Tunggu transisi (karena ada delay 1200ms di kode Anda)
+- stopApp
+- launchApp # Memastikan masuk ke Home atau Login setelah sukses

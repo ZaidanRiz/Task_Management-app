@@ -22,7 +22,6 @@ class _LoginViewState extends State<LoginView> {
     String password = _passwordController.text.trim();
 
     if (email.isNotEmpty && password.isNotEmpty) {
-      // Memanggil fungsi AuthController
       final user = await authController.signInWithEmail(email, password);
 
       if (user != null) {
@@ -35,9 +34,8 @@ class _LoginViewState extends State<LoginView> {
           snackPosition: SnackPosition.TOP,
         );
 
-        // Delay sebentar untuk transisi mulus
         await Future.delayed(const Duration(milliseconds: 1000));
-        Get.offAllNamed('/home'); // Menghapus history navigasi agar tidak bisa back
+        Get.offAllNamed('/home'); 
       }
     } else {
       Get.snackbar(
@@ -69,7 +67,7 @@ class _LoginViewState extends State<LoginView> {
               children: [
                 const Center(
                   child: Text(
-                    "Welcome Back",
+                    "Welcome~",
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                 ),
@@ -114,7 +112,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
 
                 // TOMBOL LOGIN UTAMA
                 Obx(() => SizedBox(
@@ -131,31 +129,6 @@ class _LoginViewState extends State<LoginView> {
                         : const Text("Login", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
                 )),
-
-                const SizedBox(height: 12),
-
-                // TOMBOL GOOGLE
-                Obx(() {
-                  final signing = authController.isSigningIn.value;
-                  return SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: OutlinedButton.icon(
-                      onPressed: signing ? null : () async {
-                        final res = await authController.signInWithGoogle(forceNewAccount: true);
-                        if (res != null) Get.offAllNamed('/home');
-                      },
-                      icon: signing 
-                        ? const SizedBox() 
-                        : Image.asset('assets/images/Google.png', width: 22, errorBuilder: (c, e, s) => const Icon(Icons.g_mobiledata, color: Colors.blue)),
-                      label: Text(signing ? 'Memproses...' : 'Masuk dengan Google', style: const TextStyle(fontWeight: FontWeight.w600)),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.blue),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      ),
-                    ),
-                  );
-                }),
 
                 const SizedBox(height: 30),
 
@@ -178,7 +151,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  // HELPER STYLING
+  // HELPER STYLING (Tetap sama seperti kode sebelumnya)
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,

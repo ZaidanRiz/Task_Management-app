@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:task_management_app/app/controllers/auth_controller.dart';
 import '../../../controllers/profile_controller.dart';
 import 'package:task_management_app/app/services/notification_service.dart';
 
@@ -298,8 +299,13 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
+
+              // Panggil AuthController untuk menghapus sesi Firebase
+              final authController = Get.find<AuthController>();
+              await authController.signOut();
+              // Pindah ke halaman login
               Get.offAllNamed('/login');
             },
             child: const Text('Logout', style: TextStyle(color: Colors.white)),

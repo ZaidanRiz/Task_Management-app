@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:task_management_app/app/modules/home/controllers/home_controller.dart';
+import 'package:task_management_app/app/modules/splash/views/splash_view.dart';
 import 'firebase_options.dart';
 import 'package:task_management_app/app/controllers/task_controller.dart';
 import 'package:task_management_app/app/controllers/auth_controller.dart';
@@ -35,58 +37,40 @@ void main() async {
   );
   // Inisialisasi Analytics
   FirebaseAnalytics.instance;
-  
+
   // Initialize local notifications with user's timezone
   await NotificationService.instance.init();
   // Inisialisasi controller SETELAH Firebase siap
-  Get.put(AuthController());
+  Get.put(AuthController(), permanent: true);
   Get.put(TaskController());
   Get.put(ProfileController());
+  Get.lazyPut(() => HomeController());
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
+  // Ubah ke StatelessWidget jika tidak ada logika khusus
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    // Ensure GetX snackbar controller is initialized to avoid late init errors
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      try {
-        Get.snackbar('', '',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.transparent,
-            duration: const Duration(milliseconds: 1));
-      } catch (_) {}
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       navigatorObservers: [
-    // Ini akan menggunakan Firebase Analytics untuk melacak setiap perpindahan halaman
-    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
-  ],
-
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      ],
       title: 'Task Manager',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue), // Update ke M3 yang lebih baik
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
         useMaterial3: true,
       ),
-      initialRoute: '/onboarding',
 
-      // --- PENGATURAN TRANSISI DEFAULT ---
-      // Transition.native memberikan rasa aplikasi original (iOS/Android)
-      defaultTransition: Transition.native, 
+      // --- PERUBAHAN KRUSIAL ---
+      // Jangan gunakan initialRoute. Biarkan AuthController yang menentukan.
+      home: const SplashView(),
+
+      defaultTransition: Transition.native,
       transitionDuration: const Duration(milliseconds: 400), // Durasi ideal
 
       // --- UBAH 'routes' MENJADI 'getPages' ---
@@ -101,7 +85,7 @@ class _MyAppState extends State<MyApp> {
           page: () => const HomeView(),
           binding: HomeBinding(),
           // Menggunakan native agar smooth mengikuti OS
-          transition: Transition.native, 
+          transition: Transition.native,
           transitionDuration: const Duration(milliseconds: 500),
         ),
         GetPage(name: '/signup', page: () => const SignUpView()),
@@ -122,13 +106,14 @@ class _MyAppState extends State<MyApp> {
           name: '/create-task',
           page: () => const CreateTaskView(),
           binding: CreateTaskBinding(),
-          curve: Curves.easeInOut, 
+          curve: Curves.easeInOut,
         ),
         GetPage(
           name: '/detail-task',
           page: () => const DetailTaskView(),
           binding: DetailTaskBinding(),
-          transition: Transition.cupertino, // Geser ala iOS sangat smooth untuk detail
+          transition:
+              Transition.cupertino, // Geser ala iOS sangat smooth untuk detail
         ),
         GetPage(
           name: '/onboarding',

@@ -205,6 +205,9 @@ class EditProfileController extends GetxController {
       // 3) Simpan ke state lokal
       if (newName.isNotEmpty) profile.name.value = newName;
       if (newDob.isNotEmpty) profile.birthDate.value = newDob;
+      if (uploadedPhotoUrl.isNotEmpty) {
+        profile.photoUrl.value = uploadedPhotoUrl;
+      }
 
       // 4) Persist ALL changes to Firestore users/{uid}
       try {

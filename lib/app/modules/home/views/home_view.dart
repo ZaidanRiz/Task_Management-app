@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
-import 'package:task_management_app/app/data/models/task_model.dart'; // Pastikan import model ini ada
+import 'package:task_management_app/app/data/models/task_model.dart';
+import 'package:task_management_app/app/modules/home/widgets/task_card.dart'; 
+import 'package:task_management_app/app/utils/date_helper.dart'; // Pastikan Helper ini ada
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -17,7 +19,7 @@ class HomeView extends GetView<HomeController> {
             children: [
               const SizedBox(height: 10),
 
-              // --- SEARCH BAR ---
+              // --- SEARCH BAR (Ditambahkan Obx untuk suffixIcon) ---
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
@@ -30,7 +32,7 @@ class HomeView extends GetView<HomeController> {
                         offset: const Offset(0, 5))
                   ],
                 ),
-                child: TextField(
+                child: Obx(() => TextField(
                   onChanged: (value) => controller.updateSearch(value),
                   decoration: InputDecoration(
                     border: InputBorder.none,
@@ -39,13 +41,11 @@ class HomeView extends GetView<HomeController> {
                     suffixIcon: controller.searchQuery.value.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              controller.clearSearch();
-                            },
+                            onPressed: () => controller.clearSearch(),
                           )
                         : null,
                   ),
-                ),
+                )),
               ),
               const SizedBox(height: 30),
 
@@ -77,23 +77,19 @@ class HomeView extends GetView<HomeController> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 15),
 
-              // Menggunakan Obx agar update otomatis
               Obx(() {
-                // 1. Cek apakah sedang loading?
                 if (controller.taskController.isLoading.value) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                // 2. Cek apakah data kosong?
                 if (controller.todayTasks.isEmpty) {
                   return const Text("No tasks for today",
                       style: TextStyle(color: Colors.grey));
                 }
 
-                // 3. Tampilkan Data
                 return Column(
                   children: controller.todayTasks
-                      .map((task) => _buildTaskCard(task))
+                      .map((task) => _buildTaskItem(task))
                       .toList(),
                 );
               }),
@@ -112,7 +108,7 @@ class HomeView extends GetView<HomeController> {
                 }
                 return Column(
                   children: controller.upcomingTasks
-                      .map((task) => _buildTaskCard(task))
+                      .map((task) => _buildTaskItem(task))
                       .toList(),
                 );
               }),
@@ -123,7 +119,6 @@ class HomeView extends GetView<HomeController> {
         ),
       ),
 
-      // FAB
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.toNamed('/create-task'),
         backgroundColor: Colors.blue,
@@ -132,37 +127,51 @@ class HomeView extends GetView<HomeController> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      // BOTTOM NAV BAR
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
         color: Colors.white,
-        child: SizedBox(
-          height: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.home, color: Colors.blue)), // Aktif
-              IconButton(
-                  onPressed: () => Get.toNamed('/calendar'),
-                  icon: const Icon(Icons.calendar_month, color: Colors.grey)),
-              const SizedBox(width: 40),
-              IconButton(
-                  onPressed: () => Get.toNamed('/description'),
-                  icon: const Icon(Icons.description, color: Colors.grey)),
-              IconButton(
-                  onPressed: () => Get.toNamed('/settings'),
-                  icon: const Icon(Icons.settings, color: Colors.grey)),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.home, color: Colors.blue)),
+            IconButton(
+                onPressed: () => Get.toNamed('/calendar'),
+                icon: const Icon(Icons.calendar_month, color: Colors.grey)),
+            const SizedBox(width: 40),
+            IconButton(
+                onPressed: () => Get.toNamed('/description'),
+                icon: const Icon(Icons.description, color: Colors.grey)),
+            IconButton(
+                onPressed: () => Get.toNamed('/settings'),
+                icon: const Icon(Icons.settings, color: Colors.grey)),
+          ],
         ),
       ),
     );
   }
 
   // --- HELPER WIDGETS ---
+
+  // Gunakan nama ini untuk menghindari konflik dengan nama Class TaskCard
+  Widget _buildTaskItem(TaskModel task) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: TaskCard(
+        title: task.title,
+        subtitle: task.project,
+        date: task.date,
+        // Menghitung progress dari data int (progress/total)
+        progress: (task.total == 0) ? 0 : (task.progress / task.total),
+        progressText: "${task.progress}/${task.total}",
+        // Gunakan Helper untuk warna otomatis
+        dateColor: DateHelper.getDeadlineColor(task.date),
+        onTap: () => Get.toNamed('/detail-task', arguments: task),
+      ),
+    );
+  }
 
   Widget _buildCategoryCard(IconData icon, String title, Color color,
       {VoidCallback? onTap}) {
@@ -188,125 +197,7 @@ class HomeView extends GetView<HomeController> {
             const SizedBox(height: 8),
             Text(title,
                 textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTaskCard(TaskModel task) {
-    return TaskCard(
-      title: task.title,
-      project: task.project,
-      progress: task.progress,
-      total: task.total,
-      date: task.date,
-      dateColor: task.dateColor,
-      progressColor: task.progressColor,
-      onTap: () => Get.toNamed('/detail-task', arguments: task),
-    );
-  }
-}
-
-// --- CLASS TASK CARD (Disamakan dengan halaman lain agar konsisten) ---
-class TaskCard extends StatelessWidget {
-  final String title;
-  final String project;
-  final int progress;
-  final int total;
-  final String date;
-  final Color dateColor;
-  final Color progressColor;
-  final VoidCallback? onTap;
-
-  const TaskCard({
-    required this.title,
-    required this.project,
-    required this.progress,
-    required this.total,
-    required this.date,
-    required this.dateColor,
-    required this.progressColor,
-    this.onTap,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    double progressPercentage = (total == 0) ? 0 : (progress / total);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: dateColor.withOpacity(0.4), width: 1),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.grey.withOpacity(0.15),
-                spreadRadius: 2,
-                blurRadius: 10,
-                offset: const Offset(0, 5)),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
-                const Icon(Icons.more_horiz, color: Colors.grey),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Text(project,
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
-            const SizedBox(height: 15),
-            Row(
-              children: <Widget>[
-                const Icon(Icons.list_alt, size: 14, color: Colors.grey),
-                const SizedBox(width: 5),
-                const Text('Progress',
-                    style: TextStyle(fontSize: 12, color: Colors.grey)),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: progressPercentage,
-                      minHeight: 8,
-                      backgroundColor: Colors.grey.shade200,
-                      valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Text('$progress/$total',
-                    style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            const SizedBox(height: 15),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: dateColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(date,
-                  style: TextStyle(
-                      color: dateColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12)),
-            ),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
           ],
         ),
       ),

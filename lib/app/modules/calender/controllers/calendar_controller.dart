@@ -12,7 +12,7 @@ class CalendarController extends GetxController {
 
   // START PERBAIKAN: Set tanggal default ke tanggal dummy data (7 Nov 2025)
   // Ini memastikan tugas akan muncul saat aplikasi dibuka.
-  var selectedDate = DateTime(2025, 11, 7).obs; 
+  var selectedDate = DateTime.now().obs;
   // END PERBAIKAN
 
   // Getter untuk mendapatkan nilai hari yang dipilih (untuk highlight UI)

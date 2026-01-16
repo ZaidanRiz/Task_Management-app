@@ -155,7 +155,7 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
 
               _buildOptionTile(
                 icon: Icons.settings_suggest,
-                title: 'Fix Scheduled Reminders (Android)',
+                title: 'Fix Scheduled Reminders',
                 onTap: () async {
                   await NotificationService.instance
                       .openAndroidSchedulingSettings();
@@ -173,7 +173,7 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
 
               _buildOptionTile(
                 icon: Icons.alarm_on,
-                title: 'Enable Exact Alarms (Android 12+)',
+                title: 'Enable Exact Alarms',
                 onTap: () async {
                   await NotificationService.instance
                       .requestExactAlarmPermissionIfNeeded();
@@ -186,7 +186,7 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
 
               _buildOptionTile(
                 icon: Icons.battery_saver,
-                title: 'Disable Battery Optimization (Android)',
+                title: 'Disable Battery Optimization',
                 onTap: () async {
                   await NotificationService.instance
                       .openAndroidSchedulingSettings();
@@ -199,7 +199,7 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
 
               _buildOptionTile(
                 icon: Icons.notifications_active,
-                title: 'Open Notification Settings (Android)',
+                title: 'Open Notification Settings',
                 onTap: () async {
                   await NotificationService.instance
                       .openAndroidNotificationSettings();
@@ -210,7 +210,7 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
 
               _buildOptionTile(
                 icon: Icons.info_outline,
-                title: 'Open App Details (Android)',
+                title: 'Open App Details',
                 onTap: () async {
                   await NotificationService.instance.openAndroidAppDetails();
                 },
@@ -232,8 +232,7 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
                     id: id,
                     dateTime: at,
                     title: 'Scheduled Test',
-                    body:
-                        'Seharusnya muncul dalam 1 menit (Android 14 / Xiaomi).',
+                    body: 'Test Secheduled Success.',
                   );
 
                   Get.snackbar(
@@ -312,13 +311,11 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
 
   // Widget Header Profil (UPDATED: Bisa Diklik)
   Widget _buildProfileHeader() {
-    final profile = Get.find<ProfileController>();
+    final profile =
+        Get.find<ProfileController>(); // Mengambil instance controller
+
     return GestureDetector(
-      // 1. Bungkus dengan GestureDetector
-      onTap: () {
-        // 2. Navigasi ke halaman Edit Profile
-        Get.toNamed('/edit-profile');
-      },
+      onTap: () => Get.toNamed('/edit-profile'),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         decoration: BoxDecoration(
@@ -333,78 +330,64 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
         ),
         child: Row(
           children: [
-            // Profile photo (if available) otherwise default icon
-            Builder(builder: (_) {
-              final user = FirebaseAuth.instance.currentUser;
+            // --- PERBAIKAN UTAMA: Bungkus bagian foto dengan Obx ---
+            Obx(() {
+              // Kita gunakan data dari ProfileController, bukan FirebaseAuth langsung
+              final String currentPhoto = profile.photoUrl.value;
               ImageProvider? avatarImage;
-              if (user?.photoURL != null && user!.photoURL!.isNotEmpty) {
-                final val = user.photoURL!;
-                if (val.startsWith('data:image')) {
+
+              if (currentPhoto.isNotEmpty) {
+                if (currentPhoto.startsWith('data:image')) {
                   try {
-                    final parts = val.split(',');
-                    final bytes = base64Decode(parts.last);
+                    final bytes = base64Decode(currentPhoto.split(',').last);
                     avatarImage = MemoryImage(bytes);
                   } catch (e) {
-                    avatarImage = NetworkImage(user.photoURL!);
+                    avatarImage = null;
                   }
                 } else {
-                  avatarImage = NetworkImage(user.photoURL!);
+                  avatarImage = NetworkImage(currentPhoto);
                 }
               }
 
-              return Row(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: Colors.grey.shade200,
-                    backgroundImage: avatarImage,
-                    child: avatarImage == null
-                        ? const Icon(Icons.person,
-                            size: 28, color: Colors.black87)
-                        : null,
-                  ),
-                  const SizedBox(width: 15),
-                ],
+              return CircleAvatar(
+                radius: 24,
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: avatarImage,
+                child: avatarImage == null
+                    ? const Icon(Icons.person, size: 28, color: Colors.black87)
+                    : null,
               );
             }),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Obx(() => Text(
-                      profile.name.value.isNotEmpty
-                          ? profile.name.value
-                          : 'User',
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    )),
-                Obx(() => Text(
-                      profile.birthDate.value.isNotEmpty
-                          ? profile.birthDate.value
-                          : '24-11-2025',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    )),
-              ],
+            const SizedBox(width: 15),
+
+            // Bagian Teks Nama & Tanggal Lahir
+            Expanded(
+              // Tambahkan Expanded agar tidak overflow jika nama panjang
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Obx(() => Text(
+                        profile.name.value.isNotEmpty
+                            ? profile.name.value
+                            : 'User',
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      )),
+                  Obx(() => Text(
+                        profile.birthDate.value.isNotEmpty
+                            ? profile.birthDate.value
+                            : 'Belum diatur',
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                      )),
+                ],
+              ),
             ),
-            const Spacer(),
-            // 3. Tombol Kamera & Icon Edit sebagai penanda visual
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.camera_alt, color: Colors.blue),
-                  onPressed: () {
-                    // langsung ke Edit Profile untuk mengubah foto
-                    Get.toNamed('/edit-profile');
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.grey),
-                  onPressed: () {
-                    Get.toNamed('/edit-profile');
-                  },
-                ),
-              ],
-            ),
+
+            // Icon Edit
+            const Icon(Icons.camera_alt, color: Colors.blue, size: 20),
+            const SizedBox(width: 10),
+            const Icon(Icons.edit, color: Colors.grey, size: 20),
           ],
         ),
       ),
@@ -436,11 +419,19 @@ Catatan: Exact alarms allowed = true saja belum cukup kalau battery optimization
           children: [
             Icon(icon, size: 24, color: Colors.black87),
             const SizedBox(width: 15),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            // --- PERBAIKAN DI SINI ---
+            Expanded(
+              child: Text(
+                title,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                // Opsional: jika ingin tetap 1 baris tapi pakai titik-titik di akhir
+                // overflow: TextOverflow.ellipsis,
+                // maxLines: 1,
+              ),
             ),
-            const Spacer(),
+            // -------------------------
+            const SizedBox(width: 10), // Beri jarak sedikit sebelum icon panah
             const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
           ],
         ),

@@ -7,6 +7,7 @@ class TaskCard extends StatelessWidget {
   final String date;
   final double progress;
   final String progressText;
+  final Color dateColor;
 
   // Opsional: Tambahkan callback jika ingin custom navigasi dari luar
   final VoidCallback? onTap;
@@ -18,19 +19,15 @@ class TaskCard extends StatelessWidget {
     required this.date,
     required this.progress,
     required this.progressText,
+    required this.dateColor,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    // 2. Bungkus dengan InkWell/GestureDetector untuk interaksi
     return GestureDetector(
       onTap: onTap ??
           () {
-            // Default Action jika tidak ada onTap khusus:
-            // Misalnya masuk ke detail task
-            // Get.toNamed('/task-detail', arguments: {'title': title});
-
             Get.snackbar(
               "Task Clicked",
               "You clicked on $title",
@@ -44,7 +41,7 @@ class TaskCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.blue.shade100, width: 1),
+          border: Border.all(color: dateColor.withOpacity(0.2), width: 1.5),
           boxShadow: [
             BoxShadow(color: Colors.grey.withOpacity(0.05), blurRadius: 10),
           ],
@@ -89,7 +86,7 @@ class TaskCard extends StatelessWidget {
             LinearProgressIndicator(
               value: progress,
               backgroundColor: Colors.grey.shade200,
-              color: Colors.orange,
+              color: dateColor,
               minHeight: 6,
               borderRadius: BorderRadius.circular(10),
             ),
@@ -97,13 +94,13 @@ class TaskCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.yellow.shade100,
+                color: dateColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 date,
                 style: TextStyle(
-                    color: Colors.yellow.shade900,
+                    color: dateColor,
                     fontSize: 12,
                     fontWeight: FontWeight.bold),
               ),

@@ -1,32 +1,34 @@
+// lib/app/controllers/profile_controller.dart
+
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// Controller profil sederhana untuk menyimpan data profil di memori aplikasi
-// (nama & tanggal lahir). Nama juga akan disinkronkan ke FirebaseAuth.displayName
-// saat disimpan dari EditProfile.
 class ProfileController extends GetxController {
-  final name = ''.obs; // Nama tampilan pengguna
-  final birthDate = ''.obs; // Tanggal lahir dalam format dd-MM-yyyy
+  final name = ''.obs;
+  final birthDate = ''.obs;
+  // --- TAMBAHKAN INI ---
+  final photoUrl = ''.obs; 
 
   @override
   void onInit() {
     super.onInit();
     final auth = FirebaseAuth.instance;
-    // Inisialisasi awal dari akun aktif
     final user = auth.currentUser;
+    
+    // Inisialisasi awal
     name.value = user?.displayName ?? 'User';
-    // Default tanggal lahir (jika belum pernah diisi)
+    photoUrl.value = user?.photoURL ?? ''; // Ambil foto dari Firebase Auth
+    
     if (birthDate.value.isEmpty) birthDate.value = '24-11-2025';
 
-    // Dengarkan perubahan auth (sign in/out/switch)
     auth.authStateChanges().listen((u) {
       if (u == null) {
-        // Reset ke default saat logout
         name.value = 'User';
         birthDate.value = '24-11-2025';
+        photoUrl.value = ''; // Reset foto saat logout
       } else {
-        // Saat user berganti, sinkronkan nama tampilan
         name.value = u.displayName ?? 'User';
+        photoUrl.value = u.photoURL ?? ''; // Update foto saat user berganti
       }
     });
   }

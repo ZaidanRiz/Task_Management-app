@@ -69,30 +69,31 @@ class _MyAppState extends State<MyApp> {
       title: 'Task Manager',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue), // Update ke M3 yang lebih baik
         scaffoldBackgroundColor: const Color(0xFFF5F5F5),
         useMaterial3: true,
       ),
       initialRoute: '/onboarding',
 
       // --- PENGATURAN TRANSISI DEFAULT ---
-      // Ini akan membuat SEMUA perpindahan halaman memiliki animasi ini
-      defaultTransition: Transition.cupertino, // Transisi (geser samping)
-      // Pilihan lain: Transition.zoom, Transition.fadeIn, Transition.downToUp
+      // Transition.native memberikan rasa aplikasi original (iOS/Android)
+      defaultTransition: Transition.native, 
+      transitionDuration: const Duration(milliseconds: 400), // Durasi ideal
 
       // --- UBAH 'routes' MENJADI 'getPages' ---
       getPages: [
         GetPage(
           name: '/login',
           page: () => const LoginView(),
+          transition: Transition.fadeIn, // Transisi halus saat masuk login
         ),
         GetPage(
           name: '/home',
           page: () => const HomeView(),
           binding: HomeBinding(),
-          transition:
-              Transition.native, // Anda bisa atur transisi KHUSUS di sini
-          transitionDuration: const Duration(milliseconds: 1000),
+          // Menggunakan native agar smooth mengikuti OS
+          transition: Transition.native, 
+          transitionDuration: const Duration(milliseconds: 500),
         ),
         GetPage(name: '/signup', page: () => const SignUpView()),
         GetPage(
@@ -111,12 +112,14 @@ class _MyAppState extends State<MyApp> {
         GetPage(
           name: '/create-task',
           page: () => const CreateTaskView(),
-          binding: CreateTaskBinding(), // <--- Tambahkan Baris Ini
+          binding: CreateTaskBinding(),
+          curve: Curves.easeInOut, 
         ),
         GetPage(
           name: '/detail-task',
           page: () => const DetailTaskView(),
           binding: DetailTaskBinding(),
+          transition: Transition.cupertino, // Geser ala iOS sangat smooth untuk detail
         ),
         GetPage(
           name: '/onboarding',

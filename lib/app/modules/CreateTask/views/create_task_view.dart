@@ -184,46 +184,56 @@ class CreateTaskView extends GetView<CreateTaskController> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Berikan Notifikasi Setiap:',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-              const SizedBox(height: 10),
+          // Gunakan Expanded di sini agar Column mengambil ruang yang tersedia saja
+          Expanded( 
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Berikan Notifikasi Setiap:',
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                const SizedBox(height: 10),
 
-              // Generate tombol hari berdasarkan list
-              Obx(() {
-                final labels = controller.daysLabel;
-                final selected = controller.selectedDays;
-                return Row(
-                  children: List.generate(labels.length, (index) {
-                    final isOn = selected[index];
-                    return GestureDetector(
-                      onTap: () => controller.toggleDay(index),
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        width: 30,
-                        height: 30,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: isOn ? Colors.blue : Colors.transparent,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          labels[index],
-                          style: TextStyle(
-                            color: isOn ? Colors.white : Colors.grey,
-                            fontWeight:
-                                isOn ? FontWeight.bold : FontWeight.normal,
+                Obx(() {
+                  final labels = controller.daysLabel;
+                  final selected = controller.selectedDays;
+                  
+                  // Gunakan Wrap sebagai pengganti Row agar jika tidak muat,
+                  // tombol hari akan otomatis turun ke bawah (pindah baris)
+                  return Wrap(
+                    spacing: 4, // Jarak horizontal antar tombol
+                    runSpacing: 8, // Jarak vertikal jika pindah baris
+                    children: List.generate(labels.length, (index) {
+                      final isOn = selected[index];
+                      return GestureDetector(
+                        onTap: () => controller.toggleDay(index),
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: isOn ? Colors.blue : Colors.transparent,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isOn ? Colors.blue : Colors.grey.shade300
+                            ),
+                          ),
+                          child: Text(
+                            labels[index],
+                            style: TextStyle(
+                              color: isOn ? Colors.white : Colors.grey,
+                              fontSize: 12, // Perkecil sedikit ukuran font
+                              fontWeight: isOn ? FontWeight.bold : FontWeight.normal,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
-                );
-              }),
-            ],
+                      );
+                    }),
+                  );
+                }),
+              ],
+            ),
           ),
+          const SizedBox(width: 10), // Beri jarak aman sebelum icon
           const Icon(Icons.notifications_active_outlined,
               color: Colors.orange, size: 30),
         ],

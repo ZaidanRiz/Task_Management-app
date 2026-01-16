@@ -55,6 +55,9 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icon/logo.png"
+  web:
+    generate: true
+    title: "Task Manager Pro"
 
 dev_dependencies:
   flutter_test:

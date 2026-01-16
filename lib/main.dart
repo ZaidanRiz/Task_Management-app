@@ -26,12 +26,16 @@ import 'package:task_management_app/app/modules/AiAssistant/views/ai_assistant_v
 import 'package:task_management_app/app/modules/EditProfile/bindings/edit_profile_binding.dart';
 import 'package:task_management_app/app/modules/EditProfile/views/edit_profile_view.dart';
 import 'package:task_management_app/app/services/notification_service.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Inisialisasi Analytics
+  FirebaseAnalytics.instance;
+  
   // Initialize local notifications with user's timezone
   await NotificationService.instance.init();
   // Inisialisasi controller SETELAH Firebase siap
@@ -66,6 +70,11 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      navigatorObservers: [
+    // Ini akan menggunakan Firebase Analytics untuk melacak setiap perpindahan halaman
+    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+  ],
+
       title: 'Task Manager',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
